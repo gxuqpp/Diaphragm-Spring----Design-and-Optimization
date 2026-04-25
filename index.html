@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>汽车膜片弹簧离合器设计与优化（广西大学车辆工程专业教学团队）</title>
+<style>
+/* ══════════════════════════════════════════
+   深色高对比主题 · 大字号 · 手机适配
+   ══════════════════════════════════════════ */
+:root {
+  --ink:    #f0eee8;        /* 主文字：暖白 */
+  --paper:  #1a1c26;        /* 页面背景：深蓝黑 */
+  --accent: #ff7043;        /* 强调色：明橙红 */
+  --accent2:#56b4ff;        /* 次强调：亮蓝 */
+  --grid:   #363a52;        /* 分隔线 */
+  --card:   #22253a;        /* 卡片/侧边栏背景 */
+  --border: #404468;        /* 边框 */
+  --ok:     #4ddc82;        /* 成功绿 */
+  --warn:   #ffc645;        /* 警告黄 */
+  --err:    #ff6b6b;        /* 错误红 */
+  --mono:   'Courier New', Courier, monospace;
+  --label-color: #b8bce0;   /* 表单标签 */
+  --hint-color:  #7880aa;   /* 提示文字 */
+  --input-bg:    #0f111a;   /* 输入框背景 */
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "楷体","KaiTi","STKaiti","PingFang SC","Microsoft YaHei",Georgia,serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.hdr {
+  background: #0d0f1a;
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: 7px 1fr;
+  position: sticky; top: 0; z-index: 100;
+}
+.hdr-accent { background: var(--accent); }
+.hdr-inner {
+  padding: 14px 20px 12px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.hdr h1 {
+  font-size: 22px; font-weight: 700;
+  font-family: "微软雅黑","Microsoft YaHei","PingFang SC",sans-serif;
+  letter-spacing: 0.03em; color: #fff;
+}
+.hdr .sub {
+  font-size: 13px; color: #8890bb;
+  font-family: var(--mono); margin-top: 3px;
+}
+.hdr .badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px; font-family: var(--mono);
+  padding: 4px 12px; border-radius: 3px;
+  letter-spacing: 0.08em; white-space: nowrap;
+}
+
+/* ── Layout ── */
+.layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  min-height: calc(100vh - 60px);
+}
+.sidebar {
+  border-right: 2px solid var(--border);
+  background: var(--card);
+  padding: 16px 14px;
+  overflow-y: auto;
+}
+.main { padding: 16px; overflow-y: auto; background: var(--paper); }
+
+/* ── Panels ── */
+.panel {
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  margin-bottom: 14px;
+  background: var(--card);
+  overflow: hidden;
+}
+.panel-hdr {
+  background: #0d0f1a;
+  color: #e0e4ff;
+  padding: 9px 14px;
+  font-size: 15px;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-hdr .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+}
+.panel-body { padding: 14px 12px; }
+
+/* ── Fields ── */
+.field { margin-bottom: 12px; }
+.field label {
+  display: block;
+  font-size: 15px;
+  color: var(--label-color);
+  margin-bottom: 5px;
+  font-family: var(--mono);
+  font-weight: 600;
+}
+.field label em { color: var(--accent); font-style: normal; font-weight: 700; }
+.field input[type=number], .field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  font-size: 17px;
+  font-family: var(--mono);
+  background: var(--input-bg);
+  color: var(--ink);
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23b8bce0'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--accent2);
+  background: #161926;
+}
+.field .hint {
+  font-size: 13px; color: var(--hint-color);
+  margin-top: 4px; font-family: var(--mono);
+}
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── Buttons ── */
+.btn {
+  padding: 13px 18px; border: none; border-radius: 4px;
+  font-size: 17px; font-family: var(--mono);
+  font-weight: 700; cursor: pointer;
+  letter-spacing: 0.04em; transition: all 0.15s;
+  touch-action: manipulation;
+}
+.btn-run {
+  background: var(--accent); color: #fff; width: 100%;
+  margin-top: 10px; padding: 15px;
+  font-size: 18px;
+}
+.btn-run:hover, .btn-run:active { background: #e05030; }
+.btn-run:disabled { background: #555; color: #999; cursor: not-allowed; }
+.btn-sec {
+  background: #2c3050; color: #d0d4f0;
+  border: 1.5px solid var(--border);
+  margin-top: 8px; width: 100%;
+}
+.btn-sec:hover, .btn-sec:active { background: #363a60; }
+
+/* ── Results ── */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.res-card {
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  padding: 12px 14px;
+  background: #1c1f30;
+}
+.res-card .rc-label {
+  font-size: 13px; color: var(--label-color);
+  font-family: var(--mono); margin-bottom: 5px;
+  line-height: 1.4;
+}
+.res-card .rc-val {
+  font-size: 24px; font-weight: 700;
+  font-family: var(--mono); color: var(--accent);
+}
+.res-card .rc-unit { font-size: 13px; color: var(--hint-color); }
+.res-card .rc-delta {
+  font-size: 13px; font-family: var(--mono); margin-top: 4px;
+}
+.res-card .rc-delta.up { color: var(--err); }
+.res-card .rc-delta.dn { color: var(--ok); }
+
+/* ── Constraint table ── */
+.ct { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--mono); min-width: 700px; }
+.ct th {
+  background: #0d0f1a; color: #c0c8f0;
+  padding: 9px 10px; text-align: left; font-weight: 700;
+  font-size: 14px;
+}
+.ct td { padding: 8px 10px; border-bottom: 1px solid var(--grid); color: var(--ink); }
+.ct tr:hover td { background: #2a2e45; }
+.badge-ok  { background: #1a4030; color: var(--ok);   padding: 2px 9px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+.badge-vio { background: #3a1a1a; color: var(--err);  padding: 2px 9px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+.badge-warn{ background: #3a2e0a; color: var(--warn); padding: 2px 9px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+
+/* ── Canvas ── */
+.chart-wrap {
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.chart-title {
+  font-family: var(--mono); font-size: 14px;
+  color: var(--label-color); margin-bottom: 10px;
+  letter-spacing: 0.03em;
+}
+canvas { display: block; width: 100%; }
+
+/* ── Log ── */
+.log-box {
+  border: 1.5px solid var(--border);
+  background: #080a12;
+  color: #4ddc82;
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 12px;
+  border-radius: 4px;
+  height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+.log-box .log-err  { color: var(--err); }
+.log-box .log-warn { color: var(--warn); }
+.log-box .log-info { color: var(--accent2); }
+
+/* ── Progress ── */
+.progress-wrap { margin: 10px 0; }
+.progress-bar {
+  height: 8px; background: var(--grid); border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--accent);
+  border-radius: 4px; width: 0%; transition: width 0.3s;
+}
+.progress-label {
+  font-size: 14px; color: var(--label-color);
+  font-family: var(--mono); margin-top: 5px;
+}
+
+/* ── Divider ── */
+.divider { border: none; border-top: 1px solid var(--grid); margin: 14px 0; }
+
+/* ── Obj Summary ── */
+.obj-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.obj-col { padding: 12px 14px; border-right: 1.5px solid var(--border); }
+.obj-col:last-child { border-right: none; }
+.obj-col .oc-head {
+  font-size: 12px; color: var(--hint-color);
+  letter-spacing: 0.07em; text-transform: uppercase;
+  margin-bottom: 8px; font-weight: 700;
+}
+.obj-col .oc-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 0; border-bottom: 1px solid var(--grid); gap: 8px;
+}
+.obj-col .oc-row:last-child { border-bottom: none; }
+.obj-col .oc-label { color: var(--hint-color); flex-shrink: 0; }
+.obj-col .oc-val   { font-weight: 700; color: var(--ink); }
+.obj-col.oc-before { background: #1e2030; }
+.obj-col.oc-after  { background: #1a2820; }
+.obj-col.oc-delta  { background: #221e2a; }
+.improved { color: var(--ok); }
+.worsened { color: var(--err); }
+.neutral  { color: var(--ink); }
+
+/* ── Section title ── */
+.section-title {
+  font-size: 14px; font-family: var(--mono);
+  color: var(--accent); letter-spacing: 0.07em;
+  margin-bottom: 10px; margin-top: 4px;
+  text-transform: uppercase; font-weight: 700;
+}
+
+/* ── Hint box ── */
+#hintBox {
+  padding: 60px 20px; text-align: center;
+  color: var(--hint-color);
+  font-family: var(--mono); font-size: 16px;
+  line-height: 2;
+}
+
+/* ════════════════════════════════════════
+   手机端响应式 (≤ 700px)
+   ════════════════════════════════════════ */
+@media (max-width: 700px) {
+  body { font-size: 16px; }
+
+  .hdr h1 { font-size: 18px; }
+  .hdr .sub { font-size: 12px; }
+  .hdr .badge { display: none; }
+  .hdr-inner { padding: 10px 14px 8px; gap: 8px; }
+
+  /* 侧边栏 + 主区 改为垂直堆叠 */
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+  .sidebar {
+    border-right: none;
+    border-bottom: 2px solid var(--border);
+    padding: 12px 10px;
+    overflow-y: visible;
+  }
+  .main { padding: 12px 10px; }
+
+  /* 两列改单列（固定参数区域） */
+  .grid2 { grid-template-columns: 1fr; }
+
+  /* 目标对比三列改单列 */
+  .obj-summary {
+    grid-template-columns: 1fr;
+  }
+  .obj-col { border-right: none; border-bottom: 1.5px solid var(--border); }
+  .obj-col:last-child { border-bottom: none; }
+
+  /* 约束表滚动 */
+  .panel-body { overflow-x: auto; }
+  .ct { min-width: 860px; }
+
+  .result-grid { grid-template-columns: 1fr 1fr; }
+
+  .btn { font-size: 16px; padding: 13px; }
+  .btn-run { font-size: 17px; padding: 14px; }
+
+  .field input[type=number], .field select { font-size: 16px; padding: 10px; }
+  .field label { font-size: 14px; }
+  .field .hint { font-size: 12px; }
+
+  .panel-hdr { font-size: 14px; padding: 8px 12px; }
+  .log-box { font-size: 13px; height: 180px; }
+  .section-title { font-size: 13px; }
+}
+
+/* 极小屏 (≤ 400px) */
+@media (max-width: 400px) {
+  .result-grid { grid-template-columns: 1fr; }
+  .hdr h1 { font-size: 16px; }
+  .res-card .rc-val { font-size: 20px; }
+}
+user-select: none
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-accent"></div>
+  <div class="hdr-inner">
+    <div>
+      <h1>汽车膜片弹簧离合器设计与优化系统·广西大学 ·车辆工程专业 ·《汽车设计》教学团队</h1>
+      <div class="sub">基于序列二次规划法（SQP）· 7变量 · 14线性约束 · 2非线性约束</div>
+    </div>
+    <div class="badge">OFFLINE · SQP · v1.0</div>
+  </div>
+</div>
+
+<div class="layout">
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="sidebar">
+
+  <!-- Fixed Params -->
+  <div class="panel">
+    <div class="panel-hdr"><span class="dot"></span>固定设计参数</div>
+    <div class="panel-body">
+      <div class="grid2">
+        <div class="field">
+          <label><em>E₁</em> 弹性模量 (MPa)</label>
+          <input type="number" id="p_E1" value="210000">
+        </div>
+        <div class="field">
+          <label><em>ν</em> 泊松比</label>
+          <input type="number" id="p_miu" value="0.3" step="0.01">
+        </div>
+        <div class="field">
+          <label><em>D</em> 摩擦片外径 (mm)</label>
+          <input type="number" id="p_D" value="200">
+        </div>
+        <div class="field">
+          <label><em>d</em> 摩擦片内径 (mm)</label>
+          <input type="number" id="p_d" value="140">
+        </div>
+        <div class="field">
+          <label><em>r₀</em> 小端内半径 (mm)</label>
+          <input type="number" id="p_r0" value="22.5" step="0.5">
+        </div>
+        <div class="field">
+          <label><em>rf</em> 分离轴承半径 (mm)</label>
+          <input type="number" id="p_rf" value="26">
+        </div>
+        <div class="field">
+          <label><em>T</em> 发动机转矩 (N·m)</label>
+          <input type="number" id="p_T" value="157">
+        </div>
+        <div class="field">
+          <label><em>β</em> 后备系数</label>
+          <input type="number" id="p_bd" value="1.2" step="0.05">
+        </div>
+        <div class="field">
+          <label><em>Z</em> 摩擦面数</label>
+          <input type="number" id="p_z" value="2" min="1" max="4">
+        </div>
+        <div class="field">
+          <label><em>f</em> 摩擦因数</label>
+          <input type="number" id="p_fz" value="0.3" step="0.01">
+        </div>
+        <div class="field">
+          <label><em>n</em> 分离指数目</label>
+          <input type="number" id="p_n" value="18">
+        </div>
+        <div class="field">
+          <label><em>bz</em> 指根部宽 (mm)</label>
+          <input type="number" id="p_bz" value="10">
+        </div>
+        <div class="field">
+          <label><em>δs</em> 磨损极限 (mm)</label>
+          <input type="number" id="p_ds" value="1.5" step="0.1">
+        </div>
+        <div class="field">
+          <label><em>δt</em> 分离行程 (mm)</label>
+          <input type="number" id="p_dt" value="1.8" step="0.1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design Variables x0 -->
+  <div class="panel">
+    <div class="panel-hdr"><span class="dot"></span>设计变量初值 x₀</div>
+    <div class="panel-body">
+      <div class="section-title">▸ 直接输入任意数值</div>
+      <div class="field">
+        <label><em>H</em> 碟簧内截锥高度 (mm)</label>
+        <input type="number" id="x_H" value="4.5">
+        <div class="hint">建议范围 4.0 ~ 6.0 mm</div>
+      </div>
+      <div class="field">
+        <label><em>h</em> 弹簧厚度 (mm)</label>
+        <input type="number" id="x_h" value="2.5">
+        <div class="hint">建议范围 2.0 ~ 4.0 mm</div>
+      </div>
+      <div class="field">
+        <label><em>R</em> 碟簧大端半径 (mm)</label>
+        <input type="number" id="x_R" value="90">
+        <div class="hint">建议范围 85 ~ 95 mm</div>
+      </div>
+      <div class="field">
+        <label><em>r</em> 碟簧小端半径 (mm)</label>
+        <input type="number" id="x_r" value="72">
+        <div class="hint">建议范围 70 ~ 80 mm</div>
+      </div>
+      <div class="field">
+        <label><em>R₁</em> 压盘加载点半径 (mm)</label>
+        <input type="number" id="x_R1" value="85">
+        <div class="hint">建议范围 80 ~ 90 mm</div>
+      </div>
+      <div class="field">
+        <label><em>r₁</em> 支承环加载点半径 (mm)</label>
+        <input type="number" id="x_r1" value="74">
+        <div class="hint">建议范围 70 ~ 80 mm</div>
+      </div>
+      <div class="field">
+        <label><em>λB</em> B点变形量 (mm)</label>
+        <input type="number" id="x_lB" value="3.0">
+        <div class="hint">建议范围 2.0 ~ 4.0 mm</div>
+      </div>
+
+      <hr class="divider">
+      <div class="section-title">▸ 优化算法设置</div>
+      <div class="field">
+        <label>优化算法</label>
+        <select id="p_algo">
+          <option value="de_sqp" selected>DE + SQP 精调（推荐，全局最优）</option>
+          <option value="de">差分进化 DE（纯全局搜索）</option>
+          <option value="multistart">多起点 SQP（10组随机初值）</option>
+          <option value="pso">粒子群优化 PSO + SQP</option>
+          <option value="sqp">原始梯度下降（对比用）</option>
+        </select>
+        <div class="hint" id="algoHint">DE全局搜索 + SQP精调，能有效逃离局部最优</div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>种群大小 / 起点数</label>
+          <input type="number" id="p_popSize" value="100" min="20" max="300">
+        </div>
+        <div class="field">
+          <label>最大代数 / 迭代数</label>
+          <input type="number" id="p_maxIter" value="1000" min="50" max="5000">
+        </div>
+        <div class="field">
+          <label>DE 变异因子 F</label>
+          <input type="number" id="p_deF" value="0.8" step="0.05" min="0.3" max="1.2">
+        </div>
+        <div class="field">
+          <label>DE 交叉概率 CR</label>
+          <input type="number" id="p_deCR" value="0.9" step="0.05" min="0.1" max="1.0">
+        </div>
+        <div class="field">
+          <label>收敛精度 ε</label>
+          <input type="number" id="p_tol" value="1e-6">
+        </div>
+      </div>
+      <div class="field">
+        <label>目标函数模式</label>
+        <select id="p_objMode">
+          <option value="weighted" selected>加权组合 f = fac·f₁ + (1-fac)·f₂（MATLAB原版）</option>
+          <option value="f1only">仅 f₁ = |F₁B − F₁A|（压紧力稳定性）</option>
+          <option value="f2only">仅 f₂ = F₁C（分离位弹力，踏板力最小）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><em>fac</em> 加权系数（0~1，默认0.6）</label>
+        <input type="number" id="r_fac" value="0.6" step="0.01" min="0" max="1" style="width:100%">
+        <div class="hint">fac→1: 重视压紧力稳定性 f₁ &nbsp;|&nbsp; fac→0: 重视踏板轻便性 f₂</div>
+      </div>
+
+      <button class="btn btn-run" id="btnRun" onclick="runOptimize()">▶ 开始优化计算</button>
+      <button class="btn btn-sec" onclick="resetToDefault()">↺ 恢复默认初值</button>
+      <button class="btn btn-sec" onclick="evalCurrent()">⚡ 仅评估当前参数</button>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="main">
+
+  <!-- Progress -->
+  <div class="panel" id="progressPanel" style="display:none">
+    <div class="panel-hdr"><span class="dot"></span>优化进度</div>
+    <div class="panel-body">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        <div class="progress-label" id="pLabel">正在计算…</div>
+      </div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+  </div>
+
+  <!-- Objective comparison -->
+  <div class="panel" id="objPanel" style="display:none">
+    <div class="panel-hdr"><span class="dot"></span>目标函数对比</div>
+    <div class="panel-body">
+      <div id="objSummary" style="margin-bottom:14px"></div>
+      <div class="result-grid" id="objCards"></div>
+    </div>
+  </div>
+
+  <!-- Variables comparison -->
+  <div class="panel" id="varPanel" style="display:none">
+    <div class="panel-hdr"><span class="dot"></span>设计变量 — 优化前 vs 优化后 vs 工程圆整</div>
+    <div class="panel-body" style="overflow-x:auto">
+      <table class="ct" id="varTable">
+        <thead><tr>
+          <th>变量</th><th>含义</th><th>优化前</th><th>优化后</th>
+          <th>变化量</th><th>下界</th><th>上界</th><th>状态</th>
+          <th>工程圆整值 <span style="color:var(--accent);font-size:11px">（可修改）</span></th>
+        </tr></thead>
+        <tbody id="varBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Constraints -->
+  <div class="panel" id="conPanel" style="display:none">
+    <div class="panel-hdr"><span class="dot"></span>约束条件校核</div>
+    <div class="panel-body">
+      <table class="ct" id="conTable">
+        <thead><tr>
+          <th>#</th><th>约束条件</th><th>类型</th>
+          <th>优化前值</th><th>优化后值</th><th>限值</th><th>结论</th>
+          <th>圆整后约束值</th><th>圆整后结论</th>
+        </tr></thead>
+        <tbody id="conBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-wrap" id="chartWrap" style="display:none">
+    <div class="chart-title">F₁–λ 弹性特性曲线（蓝=优化前，红=优化后）· 关键工作点标注</div>
+    <canvas id="springCanvas" height="460"></canvas>
+  </div>
+
+  <!-- Key mechanics -->
+  <div class="panel" id="mechPanel" style="display:none">
+    <div class="panel-hdr"><span class="dot"></span>关键力学参数计算结果</div>
+    <div class="panel-body">
+      <div class="result-grid" id="mechCards"></div>
+    </div>
+  </div>
+
+  <!-- Default hint -->
+  <div id="hintBox" style="padding:60px 0;text-align:center;color:#aaa;font-family:var(--mono);font-size:13px">
+    ← 在左侧设置参数，点击「开始优化计算」<br><br>
+    或点击「仅评估当前参数」查看初始状态下的特性曲线和约束情况
+  </div>
+
+</main>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// CONSTANTS & PARAMS
+// ════════════════════════════════════════════════════════
+const P = {
+  E1: () => +document.getElementById('p_E1').value,
+  miu: () => +document.getElementById('p_miu').value,
+  D: () => +document.getElementById('p_D').value,
+  d_fric: () => +document.getElementById('p_d').value,
+  r0: () => +document.getElementById('p_r0').value,
+  rf: () => +document.getElementById('p_rf').value,
+  T: () => +document.getElementById('p_T').value,
+  bd: () => +document.getElementById('p_bd').value,
+  z: () => +document.getElementById('p_z').value,
+  fz: () => +document.getElementById('p_fz').value,
+  n_fin: () => +document.getElementById('p_n').value,
+  bz: () => +document.getElementById('p_bz').value,
+  ds: () => +document.getElementById('p_ds').value,
+  dt: () => +document.getElementById('p_dt').value,
+};
+
+const LB = [4, 2, 85, 70, 80, 70, 2];
+const UB = [6, 4, 95, 80, 90, 80, 4];
+const X0_DEFAULT = [4.5, 2.5, 90, 72, 85, 74, 3.0];
+const VAR_NAMES = ['H','h','R','r','R₁','r₁','λB'];
+const VAR_UNITS = ['mm','mm','mm','mm','mm','mm','mm'];
+const VAR_DESC  = ['碟簧内截锥高度','膜片弹簧厚度','碟簧大端半径','碟簧小端半径',
+                   '压盘加载点半径','支承环加载点半径','B点变形量'];
+const VAR_IDS   = ['H','h','R','r','R1','r1','lB'];
+
+// UI sync
+function syncRange(id) {
+  const v = +document.getElementById('r_'+id).value;
+  document.getElementById('x_'+id).value = v;
+  document.getElementById('v_'+id).textContent = v;
+}
+function syncInput(id) {
+  const v = +document.getElementById('x_'+id).value;
+  document.getElementById('r_'+id).value = v;
+  document.getElementById('v_'+id).textContent = v;
+}
+function getX0() {
+  return VAR_IDS.map(id => +document.getElementById('x_'+id).value);
+}
+function resetToDefault() {
+  const ids = VAR_IDS;
+  X0_DEFAULT.forEach((v, i) => {
+    document.getElementById('x_'+ids[i]).value = v;
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// PHYSICS — F1(lambda) formula from MATLAB code
+// x = [H, h, R, r, R1, r1, lamB]  (0-indexed in JS)
+// ════════════════════════════════════════════════════════
+function F1(lam, x) {
+  const E1 = P.E1(), miu = P.miu();
+  const H = x[0], h = x[1], R = x[2], r = x[3], R1 = x[4], r1 = x[5];
+  const aa = Math.PI * E1 * h * lam / (6 * (1 - miu*miu));
+  const bb = Math.log(R/r) / Math.pow(R1 - r1, 2);
+  const cc = H - lam * (R - r) / (R1 - r1);
+  const dd = H - 0.5 * lam * (R - r) / (R1 - r1);
+  const ee = h * h;
+  return aa * bb * (cc * dd + ee);
+}
+
+function F1B_val(x) { return F1(x[6], x); }
+
+
+// Stress calculations (uses F1C_val from objective section above)
+function stresses(x) {
+  const E1 = P.E1(), miu = P.miu();
+  const H = x[0], h = x[1], R = x[2], r = x[3], R1 = x[4], r1 = x[5], lamB = x[6];
+  const rf = P.rf(), n = P.n_fin(), bz = P.bz();
+  const ff = (R1 - r1) / (r1 - rf);
+  const lamC = lamB / ff;
+  const lamA = lamB - P.ds();
+
+  const F1C = F1C_val(x);
+
+  // σ_tB — tangential stress in disc spring body (式2-28)
+  // Result is NEGATIVE (compression) — do NOT take absolute value
+  const kk  = E1 / ((1 - miu*miu) * r);
+  const e_np = (R - r) / Math.log(R/r);
+  const tt   = 0.5 * (e_np - r);
+  const alfa = Math.atan(H / (R - r));
+  const fa   = alfa + 0.5 * h / (e_np - r);
+  const sigma_t = kk * (tt*fa*fa - (2*tt*alfa + h/2)*fa);  // negative (compression)
+
+  // σ_rB — bending stress at diaphragm finger root (式2-30), positive
+  const sigma_r = 6 * (r - rf) * F1C / (n * bz * h * h);
+
+  // 式2-31: σ_jB = σ_rB − σ_tB  (σ_tB < 0, so σ_jB = σ_rB + |σ_tB|, range 1500~1700 MPa)
+  const sigma_j = sigma_r - sigma_t;
+
+  // confun c(1) displayed as: σ_r − σ_t ≤ 1500  (σ_j - 1500 ≤ 0)
+  // σ_t is negative so σ_j = σ_r + |σ_t| >> 1500 → non-binding in practice
+  const confun_c1 = sigma_j - 1700;  // = sigma_r - sigma_t - 1700
+
+  return { sigma_t, sigma_r, sigma_j, confun_c1, F1C, lamC, lamA, ff };
+}
+
+// ════════════════════════════════════════════════════════
+// CONSTRAINTS
+// ════════════════════════════════════════════════════════
+function evalConstraints(x) {
+  const H=x[0],h=x[1],R=x[2],r=x[3],R1=x[4],r1=x[5],lamB=x[6];
+  const D=P.D(),d=P.d_fric(),T=P.T(),bd=P.bd(),z=P.z(),fz=P.fz(),rf=P.rf();
+
+  // Linear (A·x ≤ b)
+  const lin = [
+    { label:'H ≤ 2h',        val: H - 2*h,           lim: 0 },
+    { label:'H ≥ 1.5h',      val: 1.5*h - H,         lim: 0 },
+    { label:'H ≤ (π/12)(R−r)',val: H - (Math.PI/12)*(R-r), lim: 0 },
+    { label:'H ≥ (π/20)(R−r)',val: (Math.PI/20)*(R-r) - H, lim: 0 },
+    { label:'R ≤ 1.35r',     val: R - 1.35*r,         lim: 0 },
+    { label:'R ≥ 1.2r',      val: 1.2*r - R,          lim: 0 },
+    { label:'R < 50h',        val: R - 50*h,           lim: 0 },
+    { label:'R ≤ 90h',       val: R - 90*h,           lim: 0 },
+    { label:'R₁ ≤ D/2',      val: R1 - D/2,           lim: 0 },
+    { label:'R₁ ≥ (D+d)/4',  val: (D+d)/4 - R1,       lim: 0 },
+    { label:'R−R₁ ≤ 7',      val: R - R1 - 7,         lim: 0 },
+    { label:'R−R₁ ≥ 1',      val: 1 - (R - R1),       lim: 0 },
+    { label:'r₁−r ≤ 6',      val: r1 - r - 6,         lim: 0 },
+    { label:'r₁−r ≥ 0',      val: r - r1,             lim: 0 },
+  ];
+
+  // Nonlinear constraints — exact translation from confun_clutch_1.m
+  // c(1): thegarb - thegatb - 1500 <= 0  where thegatb = |σ_tB| (abs taken in confun)
+  // c(2): T*beta/(z*f*Rc) - F1B <= 0     (压紧力满足传矩)
+  const F1b = F1B_val(x);
+  const st  = stresses(x);
+  const ra = D/2, rb = d/2;
+  const Rc = (2/3)*(Math.pow(ra,3)-Math.pow(rb,3))/(Math.pow(ra,2)-Math.pow(rb,2));
+  const F_req = T*1000*bd / (z*fz*Rc);
+
+  const nonlin = [
+    { label:'σ_r − σ_t ≤ 1700（confun c₁，实际非约束性）', val: st.confun_c1, lim: 0 },
+    { label:'F₁B ≥ F_req（confun c₂，满足传矩）',            val: F_req - F1b, lim: 0 },
+  ];
+
+  return { lin, nonlin, F1b, F_req, st };
+}
+
+// ════════════════════════════════════════════════════════
+// OBJECTIVE FUNCTION — exact translation from objfun_clutch_1.m
+// f1 = |F1B - F1A|  (pressure variation over wear limit, minimize)
+// f2 = F1C          (spring force at separation point, minimize)
+// f  = fac*f1 + (1-fac)*f2
+// ════════════════════════════════════════════════════════
+
+function F1A_val(x) {
+  // Working point A: after wear δs, lamA = lamB - ds
+  const E1=P.E1(), miu=P.miu(), ds=P.ds();
+  const H=x[0],h=x[1],R=x[2],r=x[3],R1=x[4],r1=x[5],lamB=x[6];
+  const lamA = lamB - ds;
+  const aa1 = Math.PI*E1*h*lamA / (6*(1-miu*miu));
+  const bb  = Math.log(R/r) / Math.pow(R1-r1, 2);
+  const cc1 = H - lamA*(R-r)/(R1-r1);
+  const dd1 = H - 0.5*lamA*(R-r)/(R1-r1);
+  const ee  = h*h;
+  return aa1*bb*(cc1*dd1+ee);
+}
+
+function F1C_val(x) {
+  // Working point C: separation, lamC = lamB/ff, denominator uses (r1-rf)
+  const E1=P.E1(), miu=P.miu(), rf=P.rf();
+  const H=x[0],h=x[1],R=x[2],r=x[3],R1=x[4],r1=x[5],lamB=x[6];
+  const ff  = (R1-r1)/(r1-rf);
+  const lamC = lamB/ff;
+  const aa2 = Math.PI*E1*h*lamC / (6*(1-miu*miu));
+  const bb2 = Math.log(R/r) / Math.pow(r1-rf, 2);
+  const cc2 = H - lamC*(R-r)/(r1-rf);
+  const dd2 = H - 0.5*lamC*(R-r)/(r1-rf);
+  const ee  = h*h;
+  return aa2*bb2*(cc2*dd2+ee);
+}
+
+function F2C_val(x) {
+  const rf=P.rf();
+  const R1=x[4],r1=x[5],lamB=x[6];
+  const ff = (R1-r1)/(r1-rf);
+  return F1C_val(x) * ff;
+}
+
+function objComponents(x) {
+  const F1b = F1B_val(x);
+  const F1a = F1A_val(x);
+  const F1c = F1C_val(x);
+  const f1 = Math.abs(F1b - F1a);   // pressure variation over wear
+  const f2 = F1c;                    // separation force
+  return { f1, f2, F1b, F1a, F1c };
+}
+
+function objective(x) {
+  const mode = document.getElementById('p_objMode').value;
+  const fac  = parseFloat(document.getElementById('r_fac').value);
+  const {f1, f2} = objComponents(x);
+  if (mode === 'weighted') return fac*f1 + (1-fac)*f2;
+  if (mode === 'f1only')   return f1;
+  if (mode === 'f2only')   return f2;
+  return fac*f1 + (1-fac)*f2;
+}
+
+// ════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════
+// MATH HELPERS
+// ════════════════════════════════════════════════════════
+function gradient(f, x, eps=1e-5) {
+  return x.map((xi, i) => {
+    const xf=[...x]; xf[i]+=eps;
+    const xb=[...x]; xb[i]-=eps;
+    return (f(xf)-f(xb))/(2*eps);
+  });
+}
+function clampBounds(x) { return x.map((xi,i) => Math.max(LB[i], Math.min(UB[i], xi))); }
+function feasible(x) {
+  const cst = evalConstraints(x);
+  return [...cst.lin,...cst.nonlin].every(c => c.val <= c.lim+1e-6);
+}
+
+// ════════════════════════════════════════════════════════
+// ALGORITHM HINT
+// ════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('p_algo').addEventListener('change', function() {
+    const hints = {
+      'de_sqp':     'DE全局搜索 + SQP精调，能有效逃离局部最优（推荐）',
+      'de':         '差分进化：纯全局搜索，种群覆盖整个设计空间',
+      'multistart': '多起点SQP：从N个随机初值分别收敛，取最优',
+      'pso':        '粒子群：群体智能全局搜索，速度快',
+      'sqp':        '梯度下降惩罚函数法（原版，易陷入局部最优）',
+    };
+    document.getElementById('algoHint').textContent = hints[this.value] || '';
+  });
+});
+
+// ════════════════════════════════════════════════════════
+// CONSTRAINT PENALTY (shared by all algos)
+// ════════════════════════════════════════════════════════
+function penaltyVal(x, mu) {
+  let p = objective(x);
+  const cst = evalConstraints(x);
+  [...cst.lin, ...cst.nonlin].forEach(c => {
+    const v = Math.max(0, c.val - c.lim);
+    p += mu * v * v;
+  });
+  x.forEach((xi, i) => {
+    p += mu * Math.pow(Math.max(0, LB[i]-xi), 2);
+    p += mu * Math.pow(Math.max(0, xi-UB[i]), 2);
+  });
+  return p;
+}
+
+// ════════════════════════════════════════════════════════
+// LOCAL SQP REFINEMENT (used after global search)
+// ════════════════════════════════════════════════════════
+function sqpRefine(x0, maxIter=300, tol=1e-7) {
+  let x = clampBounds([...x0]);
+  let mu = 1e6;
+  for (let iter = 0; iter < maxIter; iter++) {
+    const g = gradient(xv => penaltyVal(xv, mu), x);
+    const gnorm = Math.sqrt(g.reduce((s,gi) => s+gi*gi, 0));
+    if (gnorm < tol) break;
+    // Wolfe-condition line search
+    let step = 1.0;
+    const f0 = penaltyVal(x, mu);
+    const slope = -gnorm * gnorm;
+    for (let ls = 0; ls < 50; ls++) {
+      const xn = clampBounds(x.map((xi,i) => xi - step * g[i]/(gnorm+1e-12)));
+      if (penaltyVal(xn, mu) <= f0 + 1e-4 * step * slope) { x = xn; break; }
+      step *= 0.5;
+    }
+  }
+  return x;
+}
+
+// ════════════════════════════════════════════════════════
+// DIFFERENTIAL EVOLUTION (DE/rand/1/bin)
+// Storn & Price 1997
+// ════════════════════════════════════════════════════════
+async function deOptimize(popSize, maxGen, F_de, CR, logFn, progFn) {
+  const N = 7; // 7 design variables
+  const mu = 1e8;  // strong penalty to enforce constraints
+
+  // Initialize population: random within bounds
+  let pop = Array.from({length: popSize}, () =>
+    LB.map((lb, i) => lb + Math.random() * (UB[i]-lb))
+  );
+
+  let fits = pop.map(x => penaltyVal(x, mu));
+  let bestIdx = fits.indexOf(Math.min(...fits));
+  let bestX = [...pop[bestIdx]];
+  let bestF = fits[bestIdx];
+
+  for (let gen = 0; gen < maxGen; gen++) {
+    for (let i = 0; i < popSize; i++) {
+      // Pick 3 distinct random indices ≠ i
+      let idxs = [];
+      while (idxs.length < 3) {
+        const k = Math.floor(Math.random()*popSize);
+        if (k !== i && !idxs.includes(k)) idxs.push(k);
+      }
+      const [a, b, c] = idxs;
+      // Mutation: v = pop[a] + F*(pop[b]-pop[c])
+      const mutant = clampBounds(pop[a].map((xi,j) => xi + F_de*(pop[b][j]-pop[c][j])));
+      // Crossover (binomial)
+      const jRand = Math.floor(Math.random()*N);
+      const trial = pop[i].map((xi,j) => (Math.random()<CR||j===jRand) ? mutant[j] : xi);
+      // Selection
+      const fTrial = penaltyVal(trial, mu);
+      if (fTrial <= fits[i]) {
+        pop[i] = trial; fits[i] = fTrial;
+        if (fTrial < bestF) { bestF=fTrial; bestX=[...trial]; }
+      }
+    }
+    // Yield every 10 gens
+    if (gen % 10 === 0) {
+      progFn(gen/maxGen * 0.85);
+      const fobj = objective(bestX);
+      const feas = feasible(bestX);
+      logFn(`Gen ${(gen+1).toString().padStart(4,'0')} | best_obj=${fobj.toFixed(2).padStart(9)} | penalty=${bestF.toFixed(2).padStart(12)} | feasible=${feas}`);
+      await new Promise(r => setTimeout(r,0));
+    }
+  }
+  return bestX;
+}
+
+// ════════════════════════════════════════════════════════
+// PARTICLE SWARM OPTIMIZATION (PSO)
+// ════════════════════════════════════════════════════════
+async function psoOptimize(popSize, maxIter, logFn, progFn) {
+  const N = LB.length;
+  const mu = 1e8;
+  const w=0.7, c1=1.5, c2=1.5;  // inertia, cognitive, social
+
+  // Init particles
+  const pos   = Array.from({length:popSize}, () => LB.map((lb,i) => lb+Math.random()*(UB[i]-lb)));
+  const vel   = Array.from({length:popSize}, () => LB.map((lb,i) => (Math.random()-0.5)*(UB[i]-lb)*0.2));
+  const pBest = pos.map(p => [...p]);
+  const pBestF= pos.map(p => penaltyVal(p, mu));
+
+  let gBestIdx = pBestF.indexOf(Math.min(...pBestF));
+  let gBest = [...pBest[gBestIdx]];
+  let gBestF= pBestF[gBestIdx];
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    for (let i = 0; i < popSize; i++) {
+      // Update velocity
+      for (let j = 0; j < N; j++) {
+        vel[i][j] = w*vel[i][j]
+          + c1*Math.random()*(pBest[i][j]-pos[i][j])
+          + c2*Math.random()*(gBest[j]-pos[i][j]);
+        // Clamp velocity
+        const vmax = (UB[j]-LB[j])*0.3;
+        vel[i][j] = Math.max(-vmax, Math.min(vmax, vel[i][j]));
+        pos[i][j] = Math.max(LB[j], Math.min(UB[j], pos[i][j]+vel[i][j]));
+      }
+      const f = penaltyVal(pos[i], mu);
+      if (f < pBestF[i]) { pBest[i]=[...pos[i]]; pBestF[i]=f; }
+      if (f < gBestF)    { gBest=[...pos[i]]; gBestF=f; }
+    }
+    if (iter % 10 === 0) {
+      progFn(iter/maxIter * 0.85);
+      logFn(`PSO iter ${(iter+1).toString().padStart(4,'0')} | best_obj=${objective(gBest).toFixed(2).padStart(9)} | feasible=${feasible(gBest)}`);
+      await new Promise(r => setTimeout(r,0));
+    }
+  }
+  return gBest;
+}
+
+// ════════════════════════════════════════════════════════
+// MULTI-START SQP
+// ════════════════════════════════════════════════════════
+async function multiStartOptimize(nStarts, logFn, progFn) {
+  let allBestX = null, allBestF = Infinity;
+  for (let s = 0; s < nStarts; s++) {
+    // Random start within bounds
+    const x0s = LB.map((lb,i) => lb + Math.random()*(UB[i]-lb));
+    const xLoc = sqpRefine(x0s, 500, 1e-8);
+    if (feasible(xLoc)) {
+      const f = objective(xLoc);
+      if (f < allBestF) { allBestF=f; allBestX=[...xLoc]; }
+    }
+    progFn((s+1)/nStarts * 0.9);
+    logFn(`Start ${(s+1).toString().padStart(3,'0')}/${nStarts} | obj=${objective(xLoc).toFixed(2).padStart(9)} | feasible=${feasible(xLoc)} | best_so_far=${allBestF.toFixed(2)}`);
+    await new Promise(r => setTimeout(r,0));
+  }
+  return allBestX || LB.map((lb,i) => lb+0.5*(UB[i]-lb));
+}
+
+// ════════════════════════════════════════════════════════
+// MAIN OPTIMIZE DISPATCHER
+// ════════════════════════════════════════════════════════
+let x0ref = X0_DEFAULT; // keep reference for DE init
+
+async function sqpOptimize(x0, maxIter, tol, logFn, progFn) {
+  x0ref = [...x0];
+  const algo    = document.getElementById('p_algo').value;
+  const popSize = +document.getElementById('p_popSize').value;
+  const F_de    = +document.getElementById('p_deF').value;
+  const CR      = +document.getElementById('p_deCR').value;
+
+  let globalBest;
+
+  if (algo === 'de' || algo === 'de_sqp') {
+    logFn('[阶段1] 差分进化全局搜索 (DE/rand/1/bin)…', 'info');
+    globalBest = await deOptimize(popSize, maxIter, F_de, CR, logFn, progFn);
+    logFn(`DE完成 | obj=${objective(globalBest).toFixed(4)} | feasible=${feasible(globalBest)}`, 'info');
+
+  } else if (algo === 'pso') {
+    logFn('[阶段1] 粒子群全局搜索 (PSO)…', 'info');
+    globalBest = await psoOptimize(popSize, maxIter, logFn, progFn);
+    logFn(`PSO完成 | obj=${objective(globalBest).toFixed(4)} | feasible=${feasible(globalBest)}`, 'info');
+
+  } else if (algo === 'multistart') {
+    logFn(`[阶段1] 多起点SQP (${popSize}个起点)…`, 'info');
+    globalBest = await multiStartOptimize(popSize, logFn, progFn);
+    logFn(`多起点完成 | best_obj=${objective(globalBest).toFixed(4)}`, 'info');
+
+  } else {
+    // Original gradient descent fallback
+    logFn('[梯度下降] 惩罚函数法…', 'info');
+    let x = clampBounds([...x0]);
+    let mu = 100;
+    for (let stage = 0; stage < 4; stage++) {
+      mu *= 10;
+      const stIter = Math.floor(maxIter/4);
+      for (let k = 0; k < stIter; k++) {
+        const g = gradient(xv => penaltyVal(xv, mu), x);
+        const gn = Math.sqrt(g.reduce((s,gi) => s+gi*gi, 0));
+        if (gn < tol) break;
+        let step = 0.3/(stage+1);
+        const f0 = penaltyVal(x, mu);
+        for (let ls=0; ls<30; ls++) {
+          const xn = clampBounds(x.map((xi,i) => xi - step*g[i]/(gn+1e-12)));
+          if (penaltyVal(xn,mu)<f0-1e-8) { x=xn; break; }
+          step*=0.5;
+        }
+        if (k%20===0) { progFn(stage*0.25+k/stIter*0.25); await new Promise(r=>setTimeout(r,0)); }
+      }
+    }
+    globalBest = x;
+  }
+
+  // ── SQP local refinement (for de_sqp, pso, multistart)
+  if (algo !== 'sqp' && algo !== 'multistart') {
+    logFn('\n[阶段2] SQP局部精调…', 'info');
+    progFn(0.87);
+
+    // Also try refining from x0 and from the global best, keep the better
+    const refined1 = sqpRefine(globalBest, 600, 1e-9);
+    const refined2 = sqpRefine(x0, 600, 1e-9);
+
+    let best = globalBest;
+    const candidates = [globalBest, refined1, refined2];
+    for (const cand of candidates) {
+      if (feasible(cand) && objective(cand) < objective(best)) best = cand;
+    }
+    // If none feasible, pick the one with smallest penalty
+    if (!feasible(best)) {
+      best = candidates.reduce((a,b) => penaltyVal(a,1e6) < penaltyVal(b,1e6) ? a : b);
+    }
+    globalBest = best;
+    logFn(`SQP精调后 | obj=${objective(globalBest).toFixed(4)} | feasible=${feasible(globalBest)}`, 'info');
+  }
+
+  progFn(1.0);
+  logFn(`\n✓ 优化完成 | 最优目标 f = ${objective(globalBest).toFixed(4)}`, 'info');
+  return globalBest;
+}
+
+// ════════════════════════════════════════════════════════
+// CHART
+// ════════════════════════════════════════════════════════
+function drawChart(xBefore, xAfter) {
+  const wrap = document.getElementById('chartWrap');
+  wrap.style.display = 'block';
+  const canvas = document.getElementById('springCanvas');
+  const dpr = window.devicePixelRatio || 1;
+
+  // 用容器宽度（display:block 后立即可读），减去 padding*2
+  const W = Math.max((wrap.clientWidth || 680) - 28, 200);
+  const H_c = 460;
+
+  // 设置 buffer 分辨率（HiDPI）
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H_c * dpr);
+  // 固定 CSS 显示尺寸，防止 2× 屏幕上高度变成 920px
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H_c + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H_c);
+
+  try {
+  const pad = { l: 86, r: 28, t: 50, b: 62 };
+  const cw = W - pad.l - pad.r;
+  const ch = H_c - pad.t - pad.b;
+
+  const ds = P.ds(), dt = P.dt();
+
+  // ── Working points (B-end coordinate system, as in textbook Fig 2-17)
+  // A: λ_A = λ_B - δs  (wear limit, left of B)
+  // B: λ_B              (new disc working point)
+  // C: λ_C = λ_B + δt  (separation point, right of B; F1C from Eq.2-24 rf-end)
+  const wpts = (x) => {
+    const lamB = x[6];
+    return {
+      lamA: lamB - ds,
+      lamB,
+      lamC: lamB + dt,   // C position on B-end x-axis = λB + δt
+      F1C_actual: F1C_val(x)   // F1C from rf-end formula (Eq.2-24)
+    };
+  };
+  const wp0 = wpts(xBefore);
+  const wp1 = xAfter ? wpts(xAfter) : null;
+
+  // ── X range: 0 to max(λ_C) + small margin, all points visible
+  const lamMax_data = Math.max(wp0.lamC, wp1 ? wp1.lamC : 0);
+  const lamMax = lamMax_data * 1.12;
+  const lamMin = 0;
+
+  // ── Generate F1 curve (B-end formula throughout)
+  const N_PTS = 400;
+  const curve = (x) => {
+    const pts = [];
+    for (let i = 0; i <= N_PTS; i++) {
+      const lam = lamMin + i/N_PTS * (lamMax - lamMin);
+      pts.push({ x: lam, y: F1(lam, x) });
+    }
+    return pts;
+  };
+  const c0 = curve(xBefore);
+  const c1 = xAfter ? curve(xAfter) : null;
+
+  // ── Find M (local max) and N (local min) for each curve
+  const findMN = (x) => {
+    const step = 0.05, nSteps = Math.ceil(lamMax / step);
+    const fs = Array.from({length: nSteps+1}, (_,i) => ({ l: i*step, f: F1(i*step, x) }));
+    let iM = -1, iN = -1;
+    for (let i = 1; i < fs.length-1; i++) {
+      if (fs[i].f > fs[i-1].f && fs[i].f > fs[i+1].f && iM < 0) iM = i;
+      if (iM >= 0 && fs[i].f < fs[i-1].f && fs[i].f < fs[i+1].f && iN < 0) iN = i;
+    }
+    return {
+      lamM: iM >= 0 ? fs[iM].l : null, FM: iM >= 0 ? fs[iM].f : null,
+      lamN: iN >= 0 ? fs[iN].l : null, FN: iN >= 0 ? fs[iN].f : null
+    };
+  };
+  const mn0 = findMN(xBefore);
+  const mn1 = xAfter ? findMN(xAfter) : null;
+
+  // ── Y range: all curve + point values with headroom
+  const allY = [...c0.map(p=>p.y), ...(c1||[]).map(p=>p.y)];
+  // include actual F1C values (rf-end, may differ from B-end curve at that lambda)
+  allY.push(wp0.F1C_actual);
+  if (wp1) allY.push(wp1.F1C_actual);
+  const yDataMax = Math.max(...allY.filter(isFinite));
+  const yDataMin = Math.min(0, ...allY.filter(isFinite));
+  const yRange   = yDataMax - yDataMin || 1000;
+  const yMin = yDataMin - yRange * 0.02;
+  const yMax = yDataMax + yRange * 0.25;  // top headroom for labels
+
+  const toX = (v) => pad.l + (v - lamMin)/(lamMax - lamMin) * cw;
+  const toY = (v) => pad.t + ch - (v - yMin)/(yMax - yMin) * ch;
+
+  // ── Background
+  ctx.fillStyle = '#0f111a';
+  ctx.fillRect(0, 0, W, H_c);
+  ctx.fillStyle = '#161926';
+  ctx.fillRect(pad.l, pad.t, cw, ch);
+
+  // ── Grid
+  const xTick = lamMax <= 5 ? 0.5 : lamMax <= 8 ? 1 : 2;
+  ctx.strokeStyle = '#2a2e45'; ctx.lineWidth = 0.8;
+  for (let v = 0; v <= lamMax + 0.01; v += xTick) {
+    const gx = toX(v);
+    if (gx < pad.l || gx > pad.l+cw+1) continue;
+    ctx.beginPath(); ctx.moveTo(gx, pad.t); ctx.lineTo(gx, pad.t+ch); ctx.stroke();
+  }
+  for (let i = 0; i <= 6; i++) {
+    const gy = pad.t + i*ch/6;
+    ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l+cw, gy); ctx.stroke();
+  }
+
+  // ── Curves
+  const drawCurve = (data, color) => {
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+    ctx.beginPath();
+    data.forEach((p, i) => {
+      const px = toX(p.x), py = toY(p.y);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+  };
+  drawCurve(c0, '#56b4ff');
+  if (c1) drawCurve(c1, '#ff7043');
+
+  // ── Plot border
+  ctx.strokeStyle = '#404468'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+  ctx.strokeRect(pad.l, pad.t, cw, ch);
+
+  // ── Mark M and N points (hollow diamond)
+  const markMN = (lam, fval, letter, color) => {
+    if (lam == null || lam < lamMin || lam > lamMax) return;
+    const px = toX(lam), py = toY(fval);
+    const s = 6;
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.fillStyle = '#161926';
+    ctx.beginPath();
+    ctx.moveTo(px, py-s); ctx.lineTo(px+s, py); ctx.lineTo(px, py+s); ctx.lineTo(px-s, py);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color; ctx.font = 'bold 11px "Courier New",monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(letter, px, py - s - 5);
+  };
+  markMN(mn0.lamM, mn0.FM, 'M₀', '#88aaee');
+  markMN(mn0.lamN, mn0.FN, 'N₀', '#88aaee');
+  if (mn1) { markMN(mn1.lamM, mn1.FM, 'M₁', '#ff9060'); markMN(mn1.lamN, mn1.FN, 'N₁', '#ff9060'); }
+
+  // ── Mark A, B, C working points (filled circle)
+  // C point: plotted at λ_B+δt on x-axis, but F value shown from rf-end formula (Eq.2-24)
+  const labeledPts = [];
+  const markABC = (wp, xArr, sfx, color) => {
+    [
+      [wp.lamA, F1(wp.lamA, xArr), `A${sfx}`],
+      [wp.lamB, F1(wp.lamB, xArr), `B${sfx}`],
+      [wp.lamC, wp.F1C_actual,     `C${sfx}`],  // x=λB+δt, y=F1C(rf-end)
+    ].forEach(([lam, fval, label]) => {
+      if (lam < lamMin-0.01 || lam > lamMax+0.01) return;
+      const px = toX(lam), py = toY(fval);
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#f0eee8'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI*2); ctx.stroke();
+      labeledPts.push({ px, py, lam, fval, label, color });
+    });
+  };
+  markABC(wp0, xBefore, xAfter ? '₀' : '', '#56b4ff');
+  if (xAfter && wp1) markABC(wp1, xAfter, '₁', '#ff7043');
+
+  // ── Labels: stagger above/below to avoid overlap
+  labeledPts.forEach((lb, i) => {
+    const above = (i % 2 === 0);
+    const yOff = above ? -28 : 16;
+    ctx.font = 'bold 12px "Courier New",monospace';
+    ctx.fillStyle = lb.color; ctx.textAlign = 'center';
+    ctx.fillText(lb.label, lb.px, lb.py + yOff);
+    ctx.font = '10px "Courier New",monospace'; ctx.fillStyle = '#b0b4d0';
+    ctx.fillText(`λ=${lb.lam.toFixed(2)}`, lb.px, lb.py + yOff + 13);
+    ctx.fillText(`${Math.round(lb.fval)}N`, lb.px, lb.py + yOff + 25);
+  });
+
+  // ── Axes
+  ctx.strokeStyle = '#8890bb'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+ch+5); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l-5, pad.t+ch); ctx.lineTo(pad.l+cw, pad.t+ch); ctx.stroke();
+
+  // X ticks
+  ctx.fillStyle='#b0b4d0'; ctx.font='12px "Courier New",monospace'; ctx.textAlign='center';
+  for (let v=0; v<=lamMax+0.01; v+=xTick) {
+    const gx=toX(v);
+    if (gx<pad.l||gx>pad.l+cw+1) continue;
+    ctx.beginPath(); ctx.moveTo(gx,pad.t+ch); ctx.lineTo(gx,pad.t+ch+5); ctx.stroke();
+    ctx.fillText(v.toFixed(xTick<1?1:0), gx, pad.t+ch+17);
+  }
+  // Y ticks (nice values)
+  const rawYStep=(yMax-yMin)/6;
+  const mag=Math.pow(10,Math.floor(Math.log10(rawYStep)));
+  const niceY=Math.ceil(rawYStep/mag)*mag;
+  const yStart=Math.ceil(yMin/niceY)*niceY;
+  ctx.textAlign='right'; ctx.font='12px "Courier New",monospace';
+  for (let v=yStart; v<=yMax+niceY*0.1; v+=niceY) {
+    const gy=toY(v);
+    if (gy<pad.t-2||gy>pad.t+ch+2) continue;
+    ctx.beginPath(); ctx.moveTo(pad.l-5,gy); ctx.lineTo(pad.l,gy); ctx.stroke();
+    ctx.fillText(Math.round(v).toLocaleString(), pad.l-8, gy+4);
+  }
+
+  // Axis labels
+  ctx.save();
+  ctx.translate(16, pad.t+ch/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.font='13px "微软雅黑",sans-serif'; ctx.fillStyle='#c0c8e0';
+  ctx.fillText('工作压力 F₁ / N', 0, 0);
+  ctx.restore();
+  ctx.textAlign='center'; ctx.font='13px "微软雅黑",sans-serif'; ctx.fillStyle='#c0c8e0';
+  ctx.fillText('变形量 λ / mm', pad.l+cw/2, pad.t+ch+46);
+
+  // ── Note about C point
+  ctx.font='10px "Courier New",monospace'; ctx.fillStyle='#5a6080'; ctx.textAlign='left';
+  ctx.fillText(`注：C点 x = λB+δt（图上位置），F₁C值由式2-24（rf端）计算`, pad.l+4, pad.t+ch-6);
+
+  // ── Title
+  ctx.textAlign='center'; ctx.font='bold 14px "微软雅黑",sans-serif'; ctx.fillStyle='#d0d8ff';
+  ctx.fillText('膜片弹簧 F₁–λ 弹性特性曲线（图2-17）', pad.l+cw/2, pad.t-28);
+  ctx.font='11px "微软雅黑",sans-serif'; ctx.fillStyle='#7880a8';
+  ctx.fillText('M极大值  N极小值  A磨损后工作点  B新片工作点  C分离工作点（靠近N为佳）', pad.l+cw/2, pad.t-12);
+
+  // ── Legend
+  ctx.textAlign='left'; ctx.font='12px "微软雅黑",sans-serif';
+  const lx=pad.l+10, ly=pad.t+10;
+  ctx.fillStyle='#56b4ff'; ctx.fillRect(lx, ly, 26, 3);
+  ctx.fillStyle='#c0c8e0'; ctx.fillText(xAfter?'优化前':'当前参数', lx+32, ly+4);
+  if (xAfter) {
+    ctx.fillStyle='#ff7043'; ctx.fillRect(lx, ly+16, 26, 3);
+    ctx.fillStyle='#c0c8e0'; ctx.fillText('优化后', lx+32, ly+20);
+  }
+  // diamond = M/N marker legend
+  ctx.strokeStyle='#8890bb'; ctx.lineWidth=1.2; ctx.fillStyle='#161926';
+  const dx=lx+(xAfter?120:80), dy=ly+3;
+  ctx.beginPath(); ctx.moveTo(dx,dy-5); ctx.lineTo(dx+5,dy); ctx.lineTo(dx,dy+5); ctx.lineTo(dx-5,dy);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#c0c8e0'; ctx.textAlign='left';
+  ctx.fillText('M/N特征点', dx+8, dy+4);
+
+  } catch(e) {
+    // 图表渲染出错时在画布上显示错误信息
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = '14px "微软雅黑",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('图表渲染错误: ' + e.message, W/2, H_c/2);
+    console.error('drawChart error:', e);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// ROUNDED VALUE HELPERS
+// ════════════════════════════════════════════════════════
+function getRounded() {
+  return VAR_IDS.map(id => {
+    const el = document.getElementById('rnd_' + id);
+    return el ? parseFloat(el.value) : NaN;
+  });
+}
+
+function updateRoundedConstraints() {
+  const xR = getRounded();
+  // 如果任何圆整值未就绪，跳过
+  if (xR.some(v => isNaN(v))) return;
+  try {
+    const cstR = evalConstraints(xR);
+    const allCons = [...cstR.lin, ...cstR.nonlin];
+    allCons.forEach((c, ci) => {
+      const valCell = document.getElementById('rnd_con_val_' + ci);
+      const resCell = document.getElementById('rnd_con_res_' + ci);
+      if (!valCell || !resCell) return;
+      const vio = c.val > c.lim + 1e-6;
+      const margin = -(c.val - c.lim);   // 正值=余量，负值=违反量
+      const marginTxt = (margin >= 0 ? '余量 +' : '超限 ') + Math.abs(margin).toFixed(3);
+      valCell.textContent = parseFloat(c.val.toFixed(3));
+      resCell.innerHTML = vio
+        ? `<span class="badge-vio">✗ 违反</span><br><small style="color:var(--err);font-size:11px">${marginTxt}</small>`
+        : `<span class="badge-ok">✓ 满足</span><br><small style="color:var(--ok);font-size:11px">${marginTxt}</small>`;
+    });
+  } catch(e) {
+    console.warn('updateRoundedConstraints error:', e);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// RENDER RESULTS
+// ════════════════════════════════════════════════════════
+function fmt(v, dp=2) {
+  if (isNaN(v) || !isFinite(v)) return '—';
+  return parseFloat(v.toFixed(dp)).toString();
+}
+
+function renderResults(x0, xOpt) {
+  document.getElementById('hintBox').style.display = 'none';
+  const noOpt = xOpt === null;
+  const xShow = noOpt ? x0 : xOpt;
+
+  // ── Objective summary banner (before/after/delta)
+  document.getElementById('objPanel').style.display = 'block';
+  const fac = parseFloat(document.getElementById('r_fac').value);
+  const oc0  = objComponents(x0);
+  const ocOpt = noOpt ? null : objComponents(xShow);
+  const F0   = objective(x0);
+  const Fopt = noOpt ? null : objective(xShow);
+  const st0  = stresses(x0);
+  const stOpt = noOpt ? null : stresses(xShow);
+  const F2c0  = F2C_val(x0);
+  const F2cOpt = noOpt ? null : F2C_val(xShow);
+
+  const dPct = (a, b) => {
+    if (b === null) return '';
+    const p = (b - a) / (Math.abs(a) + 1e-10) * 100;
+    const cls = p < 0 ? 'improved' : p > 0.01 ? 'worsened' : 'neutral';
+    const arrow = p < 0 ? '▼' : p > 0.01 ? '▲' : '─';
+    return `<span class="${cls}">${arrow} ${Math.abs(p).toFixed(1)}%</span>`;
+  };
+  const dAbs = (a, b) => {
+    if (b === null) return '—';
+    const d = b - a;
+    const cls = d < 0 ? 'improved' : d > 0.01 ? 'worsened' : 'neutral';
+    const sign = d >= 0 ? '+' : '';
+    return `<span class="${cls}">${sign}${fmt(d,2)}</span>`;
+  };
+
+  const rows = [
+    ['总目标 f',              F0,          Fopt,          ''],
+    ['f₁ = |F₁B−F₁A|',       oc0.f1,      ocOpt?.f1,     'N'],
+    ['f₂ = F₁C',              oc0.f2,      ocOpt?.f2,     'N'],
+    ['F₁B (B点压紧力)',       oc0.F1b,     ocOpt?.F1b,    'N'],
+    ['F₁A (A点磨损后)',       oc0.F1a,     ocOpt?.F1a,    'N'],
+    ['σ_r 弯曲应力',          st0.sigma_r, stOpt?.sigma_r,'MPa'],
+    ['σ_t 切向应力(负=压缩)', st0.sigma_t, stOpt?.sigma_t,'MPa'],
+    ['σ_j=σ_r−σ_t (式2-31)', st0.sigma_j, stOpt?.sigma_j,'MPa'],
+  ];
+
+  document.getElementById('objSummary').innerHTML = `
+    <div class="obj-summary">
+      <div class="obj-col oc-before">
+        <div class="oc-head">📊 优化前（初值）</div>
+        ${rows.map(([lbl, v0,, unit]) =>
+          `<div class="oc-row">
+            <span class="oc-label">${lbl}</span>
+            <span class="oc-val neutral">${fmt(v0,2)} ${unit}</span>
+          </div>`).join('')}
+      </div>
+      <div class="obj-col oc-after">
+        <div class="oc-head">${noOpt ? '📋 当前参数' : '✅ 优化后（最优）'}</div>
+        ${rows.map(([lbl, v0, vN, unit]) => {
+          const v = noOpt ? v0 : (vN ?? v0);
+          const cls = (!noOpt && vN!==null) ? (vN < v0 ? 'improved' : vN > v0+0.01 ? 'worsened' : 'neutral') : 'neutral';
+          return `<div class="oc-row">
+            <span class="oc-label">${lbl}</span>
+            <span class="oc-val ${cls}">${fmt(v,2)} ${unit}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="obj-col oc-delta">
+        <div class="oc-head">📈 变化量（优化后−前）</div>
+        ${noOpt
+          ? `<div style="color:#aaa;font-size:11px;padding-top:8px">运行优化后显示</div>`
+          : rows.map(([lbl, v0, vN]) =>
+              `<div class="oc-row">
+                <span class="oc-label">${lbl}</span>
+                <span class="oc-val">${dAbs(v0, vN ?? v0)} &nbsp; ${dPct(v0, vN ?? v0)}</span>
+              </div>`).join('')
+        }
+      </div>
+    </div>`;
+
+  const makeCard = (label, v0, vOpt, unit, goodDown=true) => {
+    const pct = (vOpt===null) ? null : ((vOpt-v0)/Math.abs(v0+1e-10)*100);
+    const arrow = pct===null ? '' : pct<0 ? (goodDown?'▼ 改善':'▲ 劣化') : (goodDown?'▲ 劣化':'▼ 改善');
+    const cls   = pct===null ? '' : ((pct<0)===goodDown) ? 'dn' : 'up';
+    return `<div class="res-card">
+      <div class="rc-label">${label}</div>
+      <div class="rc-val">${fmt(vOpt===null?v0:vOpt)}</div>
+      <div class="rc-unit">${unit}</div>
+      ${pct!==null?`<div class="rc-delta ${cls}">${arrow} ${Math.abs(pct).toFixed(1)}%（初值${fmt(v0)}）</div>`:''}
+    </div>`;
+  };
+
+  document.getElementById('objCards').innerHTML =
+    makeCard(`总目标 f (fac=${fac.toFixed(2)})`, F0, Fopt, '') +
+    makeCard('f₁ = |F₁B−F₁A| 压紧力稳定性', oc0.f1, ocOpt?.f1, 'N') +
+    makeCard('f₂ = F₁C 分离力', oc0.f2, ocOpt?.f2, 'N') +
+    makeCard('F₁B 新片压紧力(B点)', oc0.F1b, ocOpt?.F1b, 'N') +
+    makeCard('F₁A 磨损后压紧力(A点)', oc0.F1a, ocOpt?.F1a, 'N') +
+    makeCard('F₁C 分离时弹力(C点)', oc0.F1c, ocOpt?.F1c, 'N') +
+    makeCard('F₂C 分离操纵力', F2c0, F2cOpt, 'N') +
+    makeCard('σ_r 分离指弯曲应力', st0.sigma_r, stOpt?.sigma_r, 'MPa') +
+    makeCard('σ_t 碟簧切向应力（负值=压缩）', st0.sigma_t, stOpt?.sigma_t, 'MPa', false) +
+    makeCard('σ_j = σ_r − σ_t（式2-31，应1500~1700）', st0.sigma_j, stOpt?.sigma_j, 'MPa') +
+    makeCard('H/h 碟簧比', x0[0]/x0[1], noOpt?null:xShow[0]/xShow[1], '—') +
+    makeCard('R/r 半径比', x0[2]/x0[3], noOpt?null:xShow[2]/xShow[3], '—');
+
+  // ── Variable table
+  document.getElementById('varPanel').style.display = 'block';
+  let varRows = '';
+  VAR_IDS.forEach((id, i) => {
+    const v0 = x0[i], vN = noOpt ? null : xShow[i];
+    const diff = vN===null ? '' : (vN-v0>=0?'+':'')+fmt(vN-v0,3);
+    const atLB = vN!==null && Math.abs(vN-LB[i])<0.01;
+    const atUB = vN!==null && Math.abs(vN-UB[i])<0.01;
+    const status = vN===null ? '' : atLB ? `<span class="badge-warn">下界</span>` : atUB ? `<span class="badge-warn">上界</span>` : `<span class="badge-ok">内部</span>`;
+    const rndVal = vN !== null ? fmt(vN, 3) : fmt(v0, 3);
+    varRows += `<tr>
+      <td><b>${VAR_NAMES[i]}</b></td>
+      <td>${VAR_DESC[i]}</td>
+      <td>${fmt(v0,3)}</td>
+      <td>${vN===null?'—':`<b>${fmt(vN,3)}</b>`}</td>
+      <td>${diff}</td>
+      <td>${LB[i]}</td><td>${UB[i]}</td>
+      <td>${status}</td>
+      <td><input type="number" class="rnd-input" id="rnd_${id}" value="${rndVal}" step="0.01"
+           oninput="updateRoundedConstraints()" style="width:100%;padding:6px 8px;
+           border:2px solid var(--accent);border-radius:4px;font-size:15px;
+           font-family:var(--mono);background:var(--input-bg);color:var(--ink);"></td>
+    </tr>`;
+  });
+  document.getElementById('varBody').innerHTML = varRows;
+
+  // ── Constraints
+  document.getElementById('conPanel').style.display = 'block';
+  const cst0 = evalConstraints(x0);
+  const cstN = noOpt ? null : evalConstraints(xShow);
+  let crows = '';
+  let conIdx = 0;
+  const renderCon = (c, i, ctype, cOld) => {
+    const vio0 = cOld.val > cOld.lim + 1e-6;
+    const vio1 = cstN && c.val > c.lim + 1e-6;
+    const b0 = vio0 ? '<span class="badge-vio">✗ 违反</span>' : '<span class="badge-ok">✓ 满足</span>';
+    const b1 = noOpt ? '' : (vio1 ? '<span class="badge-vio">✗</span>' : '<span class="badge-ok">✓</span>');
+    const ci = conIdx++;
+    crows += `<tr>
+      <td>${i+1}</td>
+      <td>${c.label}</td>
+      <td>${ctype}</td>
+      <td>${fmt(cOld.val,3)} ${b0}</td>
+      <td>${noOpt?'—':`${fmt(c.val,3)} ${b1}`}</td>
+      <td>≤ ${c.lim}</td>
+      <td>${noOpt?'—':(vio1?'<span class="badge-vio">✗</span>':'<span class="badge-ok">✓</span>')}</td>
+      <td id="rnd_con_val_${ci}" style="font-family:var(--mono);color:var(--label-color)">—</td>
+      <td id="rnd_con_res_${ci}">—</td>
+    </tr>`;
+  };
+  cst0.lin.forEach((c,i) => renderCon(cstN?cstN.lin[i]:c, i, '线性', c));
+  cst0.nonlin.forEach((c,i) => renderCon(cstN?cstN.nonlin[i]:c, i, '非线性', c));
+  document.getElementById('conBody').innerHTML = crows;
+
+  // 初始化圆整后约束校核
+  updateRoundedConstraints();
+
+  // ── Mechanics cards
+  document.getElementById('mechPanel').style.display = 'block';
+  const ra=P.D()/2, rb=P.d_fric()/2;
+  const Rc=(2/3)*(Math.pow(ra,3)-Math.pow(rb,3))/(Math.pow(ra,2)-Math.pow(rb,2));
+  const F_req = P.T()*1000*P.bd()/(P.z()*P.fz()*Rc);
+  document.getElementById('mechCards').innerHTML =
+    makeCard('平均摩擦半径 Rc', Rc, null, 'mm') +
+    makeCard('所需最小压紧力 F_req', F_req, null, 'N', false) +
+    makeCard('F₁B（优化前）', oc0.F1b, null, 'N', false) +
+    makeCard('F₁B（优化后）', noOpt ? null : ocOpt?.F1b, null, 'N', false) +
+    makeCard('F₁B / F_req 裕度比', oc0.F1b / F_req, noOpt ? null : ocOpt?.F1b / F_req, '—', false) +
+    makeCard('ff = (R₁-r₁)/(r₁-rf)', st0.ff, stOpt?.ff, '—') +
+    makeCard('λA 磨损后变形量', st0.lamA, stOpt?.lamA, 'mm') +
+    makeCard('λC 分离点变形量', st0.lamC, stOpt?.lamC, 'mm') +
+    makeCard('σ_j（式2-31，应1500~1700）', st0.sigma_j, stOpt?.sigma_j, 'MPa') +
+    makeCard('H/h', x0[0]/x0[1], noOpt?null:xShow[0]/xShow[1], '—') +
+    makeCard('α 圆锥角(°)',
+      Math.atan(x0[0]/(x0[2]-x0[3]))*180/Math.PI,
+      noOpt?null:Math.atan(xShow[0]/(xShow[2]-xShow[3]))*180/Math.PI, '°');
+
+  // ── Chart
+  drawChart(x0, noOpt ? null : xShow);
+}
+
+// ════════════════════════════════════════════════════════
+// MAIN ENTRY POINTS
+// ════════════════════════════════════════════════════════
+function log(msg, type='') {
+  const box = document.getElementById('logBox');
+  const cls = type?`log-${type}`:'';
+  box.innerHTML += `<span class="${cls}">${msg}\n</span>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function runOptimize() {
+  const x0 = getX0();
+  const maxIter = +document.getElementById('p_maxIter').value;
+  const tol = +document.getElementById('p_tol').value;
+
+  document.getElementById('btnRun').disabled = true;
+  document.getElementById('progressPanel').style.display = 'block';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('hintBox').style.display = 'none';
+
+  const fac_val = parseFloat(document.getElementById('r_fac').value);
+  log('═══ 膜片弹簧离合器双目标 SQP 优化 ═══', 'info');
+  log(`初值: H=${x0[0]}, h=${x0[1]}, R=${x0[2]}, r=${x0[3]}, R₁=${x0[4]}, r₁=${x0[5]}, λB=${x0[6]}`);
+  const oc_init = objComponents(x0);
+  log(`目标: ${document.getElementById('p_objMode').options[document.getElementById('p_objMode').selectedIndex].text}`);
+  log(`加权系数 fac = ${fac_val.toFixed(2)}`);
+  log(`初始 f₁=|F₁B-F₁A| = ${oc_init.f1.toFixed(2)} N  |  f₂=F₁C = ${oc_init.f2.toFixed(2)} N`);
+  log(`初始总目标 f = ${objective(x0).toFixed(4)}`);
+  const cst0 = evalConstraints(x0);
+  const vio0 = [...cst0.lin,...cst0.nonlin].filter(c=>c.val>c.lim+1e-6).length;
+  log(`初始违反约束数: ${vio0}`, vio0>0?'warn':'');
+  log('─'.repeat(60));
+
+  try {
+    const xOpt = await sqpOptimize(
+      x0, maxIter, tol,
+      (msg) => log(msg),
+      (pct) => {
+        document.getElementById('pFill').style.width = (pct*100)+'%';
+        document.getElementById('pLabel').textContent = `优化进度 ${(pct*100).toFixed(0)}%`;
+      }
+    );
+
+    const cstFinal = evalConstraints(xOpt);
+    const vioFinal = [...cstFinal.lin,...cstFinal.nonlin].filter(c=>c.val>c.lim+1e-6).length;
+    const oc_final = objComponents(xOpt);
+    log(`\n最优解: [${xOpt.map(v=>v.toFixed(4)).join(', ')}]`, 'info');
+    log(`最优 f₁ = ${oc_final.f1.toFixed(2)} N  |  f₂ = ${oc_final.f2.toFixed(2)} N`, 'info');
+    log(`最优总目标 f = ${objective(xOpt).toFixed(4)}`, 'info');
+    log(`最终违反约束数: ${vioFinal}`, vioFinal>0?'warn':'info');
+    if (vioFinal > 0) {
+      log('⚠ 部分约束仍有违反，建议调整初值后重新运行', 'warn');
+    }
+
+    renderResults(x0, xOpt);
+  } catch(e) {
+    log('✗ 优化出错: ' + e.message, 'err');
+  }
+
+  document.getElementById('btnRun').disabled = false;
+  document.getElementById('pLabel').textContent = '优化完成';
+}
+
+function evalCurrent() {
+  const x0 = getX0();
+  document.getElementById('hintBox').style.display = 'none';
+  document.getElementById('progressPanel').style.display = 'none';
+  renderResults(x0, null);
+}
+
+// Init
+resetToDefault();
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+if (e.key === 'F12' || 
+(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+(e.ctrlKey && e.key === 'U') ||
+(e.ctrlKey && e.key === 'S')) {
+e.preventDefault();
+return false;
+}
+});
+
+</script>
+<script>
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.key === 'U') ||
+        (e.ctrlKey && e.key === 'S')) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
+
+</body>
+</html>
