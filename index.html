@@ -363,168 +363,258 @@ canvas { display: block; width: 100%; }
   .res-card .rc-val { font-size: 20px; }
 }
 
-/* ═══════════════════════════════════════════
-   学生登录 / 教师登录 覆盖层
-   ═══════════════════════════════════════════ */
-.overlay {
-  position: fixed; top:0; left:0; right:0; bottom:0;
-  background: rgba(0,0,0,0.82); backdrop-filter: blur(3px);
+/* ══════════════════════════════════════
+   NEW: 登录 / 教师 / 评分 样式（深色主题）
+   ══════════════════════════════════════ */
+
+/* ── 登录遮罩 ── */
+.login-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.88);
   display: flex; align-items: center; justify-content: center;
   z-index: 9999;
 }
-.overlay-box {
-  background: #1e2236; border: 2px solid var(--border);
-  border-radius: 10px; padding: 32px 36px;
+.login-box {
+  background: #1e2138;
+  border: 2px solid var(--border);
+  padding: 36px 32px;
+  border-radius: 10px;
   max-width: 460px; width: 92%;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+  box-shadow: 0 16px 64px rgba(0,0,0,0.7);
 }
-.overlay-box h2 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
-.overlay-box .desc { font-size: 13px; color: var(--hint-color); margin-bottom: 24px; line-height: 1.7; font-family: var(--mono); }
+.login-box h2 {
+  font-size: 22px; font-weight: 700;
+  font-family: "微软雅黑","Microsoft YaHei",sans-serif;
+  color: var(--accent); margin-bottom: 8px;
+}
+.login-box .desc {
+  font-size: 13px; color: var(--hint-color);
+  margin-bottom: 24px; line-height: 1.7;
+}
 .login-field { margin-bottom: 18px; }
-.login-field label { display:block; font-size:14px; color:var(--label-color); margin-bottom:6px; font-family:var(--mono); font-weight:600; }
-.login-field input { width:100%; padding:11px 14px; border:2px solid var(--border); border-radius:5px; font-size:16px; font-family:var(--mono); background:var(--input-bg); color:var(--ink); transition:border-color 0.15s; }
-.login-field input:focus { outline:none; border-color:var(--accent2); }
-.login-field .hint { font-size:12px; color:var(--hint-color); margin-top:4px; font-family:var(--mono); }
-.login-field .err { font-size:12px; color:var(--err); margin-top:4px; display:none; font-family:var(--mono); }
-.login-submit { width:100%; padding:13px; background:var(--accent); color:#fff; border:none; border-radius:5px; font-size:17px; font-weight:700; cursor:pointer; font-family:var(--mono); letter-spacing:0.04em; transition:background 0.15s; margin-top:4px; }
-.login-submit:hover { background:#e05030; }
-.login-cancel { width:100%; padding:10px; background:#2c3050; color:var(--label-color); border:1.5px solid var(--border); border-radius:5px; font-size:15px; cursor:pointer; font-family:var(--mono); margin-top:8px; transition:background 0.15s; }
-.login-cancel:hover { background:#363a60; }
-
-/* ── 顶栏学生徽章 + 教师按钮 ── */
-.hdr-student {
-  background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
-  padding: 7px 14px; border-radius: 5px; font-family:var(--mono); font-size:13px; color:#d0d4f0;
+.login-field label {
+  display: block; margin-bottom: 6px;
+  font-size: 13px; color: var(--label-color);
+  font-family: var(--mono); font-weight: 600;
 }
-.hdr-student .s-label { font-size:11px; color:#8890bb; }
-.hdr-student .s-val { font-size:14px; font-weight:700; color:#fff; margin-top:2px; }
-.hdr-teacher-btn {
-  background: rgba(255,112,67,0.18); border:1px solid var(--accent);
-  color:var(--accent); padding:8px 16px; border-radius:5px; cursor:pointer;
-  font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:0.04em;
-  transition:all 0.15s; white-space:nowrap;
+.login-field input {
+  width: 100%; padding: 11px 14px;
+  border: 2px solid var(--border); border-radius: 5px;
+  font-size: 15px; font-family: var(--mono);
+  background: var(--input-bg); color: var(--ink);
+  transition: border-color 0.2s;
 }
-.hdr-teacher-btn:hover { background:var(--accent); color:#fff; }
+.login-field input:focus { outline: none; border-color: var(--accent2); }
+.login-field .hint { font-size: 12px; color: var(--hint-color); margin-top: 4px; }
+.login-field .err-msg {
+  font-size: 12px; color: var(--err); margin-top: 4px; display: none;
+}
+.login-btn {
+  width: 100%; padding: 13px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 5px;
+  font-size: 16px; font-family: var(--mono); font-weight: 700;
+  cursor: pointer; transition: background 0.15s; margin-top: 4px;
+}
+.login-btn:hover { background: #e05030; }
+.login-btn.secondary {
+  background: #2c3050; border: 1.5px solid var(--border);
+  margin-top: 8px; font-size: 14px;
+}
+.login-btn.secondary:hover { background: #363a60; }
 
-/* ═══════════════════════════════════════════
-   智能评分报告
-   ═══════════════════════════════════════════ */
+/* ── 学生徽章 + 教师按钮（header内） ── */
+.stu-badge {
+  background: rgba(255,112,67,0.15);
+  border: 1px solid rgba(255,112,67,0.4);
+  padding: 6px 16px; border-radius: 4px;
+  font-size: 13px; font-family: var(--mono); color: var(--ink);
+  white-space: nowrap;
+}
+.stu-badge .sb-label { font-size: 11px; color: var(--hint-color); }
+.stu-badge .sb-val { font-weight: 700; color: var(--accent); margin-top: 2px; }
+.teacher-hdr-btn {
+  background: rgba(86,180,255,0.15);
+  border: 1px solid rgba(86,180,255,0.4);
+  padding: 8px 16px; border-radius: 4px;
+  font-size: 13px; font-family: var(--mono); color: #a0d8ff;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.teacher-hdr-btn:hover { background: rgba(86,180,255,0.28); color: #fff; }
+
+/* ══ 智能评分报告面板（v15 样式）══ */
+
+/* 总分英雄卡 */
 .score-hero {
   background: linear-gradient(135deg, #1a2060 0%, #0d1a3a 60%, #1a0d2e 100%);
-  border:2px solid #4060a0; border-radius:8px; padding:24px;
-  text-align:center; margin-bottom:14px;
+  border: 2px solid #4060a0; border-radius: 8px;
+  padding: 24px; text-align: center; margin-bottom: 16px;
 }
-.score-hero .sh-total { font-size:72px; font-weight:700; color:#7ecfff; font-family:var(--mono); line-height:1; }
-.score-hero .sh-grade { font-size:26px; font-weight:700; margin-top:6px; }
-.score-hero .sh-label { font-size:13px; color:#8890bb; margin-bottom:16px; font-family:var(--mono); }
+.score-hero .sh-label { font-size: 13px; color: #8890bb; margin-bottom: 12px; font-family: var(--mono); display: block; }
+.score-hero .sh-total { font-size: 72px; font-weight: 700; color: #7ecfff; font-family: var(--mono); line-height: 1; display: block; }
+.score-hero .sh-grade { font-size: 26px; font-weight: 700; margin-top: 8px; display: block; }
+
+/* 各维度小格子 */
 .score-dims {
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px; margin-top: 18px;
 }
-.sd-item { background:rgba(255,255,255,0.1); border-radius:6px; padding:10px 8px; text-align:center; }
-.sd-item .sd-lbl { font-size:11px; color:#8890bb; font-family:var(--mono); }
-.sd-item .sd-val { font-size:18px; font-weight:700; color:#7ecfff; margin-top:4px; font-family:var(--mono); }
+.sd-item {
+  background: rgba(255,255,255,0.1); border-radius: 6px;
+  padding: 10px 8px; text-align: center;
+}
+.sd-item .sd-lbl { font-size: 11px; color: #8890bb; font-family: var(--mono); line-height: 1.4; display: block; }
+.sd-item .sd-val { font-size: 18px; font-weight: 700; color: #7ecfff; margin-top: 4px; font-family: var(--mono); display: block; }
 
-.score-table { width:100%; border-collapse:collapse; font-size:13px; font-family:var(--mono); margin-top:8px; }
-.score-table th { background:#0d0f1a; color:#c0c8f0; padding:8px 10px; border:1px solid var(--grid); font-weight:700; text-align:left; }
-.score-table td { padding:7px 10px; border:1px solid var(--grid); color:var(--ink); }
-.score-table tr:hover td { background:#2a2e45; }
+/* 详细评分表 */
+.score-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; font-family: var(--mono);
+  margin-top: 8px; table-layout: fixed;
+}
+.score-table th {
+  background: #0d0f1a; color: #c0c8f0;
+  padding: 9px 10px; border: 1px solid var(--grid);
+  font-weight: 700; text-align: left;
+  white-space: nowrap;
+}
+.score-table td {
+  padding: 8px 10px; border: 1px solid var(--grid);
+  color: var(--ink); vertical-align: top;
+  word-break: break-word;
+}
+.score-table tr:hover td { background: #2a2e45; }
+/* 列宽分配：项目名 22% | 标准要求 24% | 实际情况 30% | 状态 10% | 得分 14% */
+.score-table th:nth-child(1), .score-table td:nth-child(1) { width: 22%; }
+.score-table th:nth-child(2), .score-table td:nth-child(2) { width: 24%; font-size: 12px; color: var(--hint-color); }
+.score-table th:nth-child(3), .score-table td:nth-child(3) { width: 30%; }
+.score-table th:nth-child(4), .score-table td:nth-child(4) { width: 10%; text-align: center; }
+.score-table th:nth-child(5), .score-table td:nth-child(5) { width: 14%; text-align: center; }
 
+/* 改进建议框 */
 .advice-box {
-  background:#0d1520; border-left:3px solid var(--accent2);
-  padding:12px 16px; border-radius:0 5px 5px 0; font-size:13px;
-  color:#b0c8e0; line-height:2; font-family:var(--mono);
-  margin:8px 0;
+  background: #0d1520; border-left: 3px solid var(--accent2);
+  padding: 12px 16px; border-radius: 0 5px 5px 0;
+  font-size: 13px; color: #b0c8e0;
+  line-height: 2.2; font-family: var(--mono);
+  margin: 8px 0;
 }
 
-/* ═══════════════════════════════════════════
-   教师管理面板
-   ═══════════════════════════════════════════ */
-.teacher-panel-box {
-  background:#1a1c26; border:2px solid var(--border); border-radius:12px;
-  max-width:1000px; width:96%; max-height:90vh; overflow-y:auto;
-  padding:28px 28px; box-shadow:0 12px 48px rgba(0,0,0,0.7);
+/* ── 教师统计面板（弹出覆盖层） ── */
+.teacher-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.88);
+  display: flex; align-items: flex-start; justify-content: center;
+  z-index: 9998; padding: 20px; overflow-y: auto;
 }
-.teacher-panel-box h2 { font-size:22px; font-weight:700; color:var(--accent2); margin-bottom:16px; font-family:var(--mono); }
-
-.tp-card { background:var(--card); border:1.5px solid var(--border); border-radius:6px; padding:16px; margin-bottom:14px; }
-.tp-card-title { font-size:14px; font-weight:700; color:var(--accent); font-family:var(--mono); letter-spacing:0.05em; border-bottom:1px solid var(--grid); padding-bottom:8px; margin-bottom:12px; }
-.info-notice { background:#131c2a; border:1px solid #2a4a6a; border-radius:5px; padding:10px 14px; font-size:12px; color:#7aa0c0; font-family:var(--mono); line-height:1.8; margin-bottom:10px; }
-.tp-upload-zone { border:2px dashed var(--border); border-radius:6px; padding:30px 20px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--input-bg); }
-.tp-upload-zone:hover { border-color:var(--accent2); background:#161926; }
-.tp-upload-zone .tz-icon { font-size:40px; margin-bottom:8px; }
-.tp-upload-zone .tz-text { font-size:14px; color:var(--label-color); font-family:var(--mono); }
-.tp-upload-zone .tz-hint { font-size:12px; color:var(--hint-color); margin-top:6px; font-family:var(--mono); }
-
-.stats-banner {
-  background: linear-gradient(135deg,#1a0d30,#0d1a30);
-  border:1.5px solid #4a3080; border-radius:7px;
-  padding:18px 20px; margin-bottom:14px;
+.teacher-panel {
+  background: #1a1c26;
+  border: 2px solid var(--border);
+  border-radius: 10px; max-width: 1060px; width: 100%;
+  padding: 28px; margin: auto;
+  box-shadow: 0 16px 60px rgba(0,0,0,0.7);
 }
-.stats-banner h3 { font-size:16px; font-weight:700; color:var(--accent2); font-family:var(--mono); margin-bottom:12px; }
-.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; }
-.stat-item { background:rgba(255,255,255,0.1); border-radius:6px; padding:12px; text-align:center; }
-.stat-item .si-lbl { font-size:11px; color:#8890bb; font-family:var(--mono); }
-.stat-item .si-val { font-size:26px; font-weight:700; color:#fff; margin-top:4px; font-family:var(--mono); }
+.teacher-panel h2 { font-size: 22px; font-weight: 700; color: var(--accent2); margin-bottom: 4px; }
+.teacher-panel .tp-sub { font-size: 13px; color: var(--hint-color); margin-bottom: 20px; }
+.tp-card {
+  background: #22253a; border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 16px; margin-bottom: 14px;
+}
+.tp-card-title {
+  font-size: 14px; font-family: var(--mono); font-weight: 700;
+  color: var(--accent); margin-bottom: 10px;
+  border-bottom: 1px solid var(--grid); padding-bottom: 6px;
+}
+.tp-upload-zone {
+  border: 2px dashed var(--border); border-radius: 7px;
+  padding: 30px 20px; text-align: center; cursor: pointer;
+  transition: all 0.3s; background: #1a1c26;
+}
+.tp-upload-zone:hover { border-color: var(--accent2); background: #1e2238; }
+.tp-upload-zone.dragover { border-color: var(--accent); background: #2a1a1a; }
+.tp-upload-zone .uiz { font-size: 36px; margin-bottom: 8px; }
+.tp-upload-zone .uit { font-size: 14px; color: var(--label-color); }
+.tp-upload-zone .uih { font-size: 12px; color: var(--hint-color); margin-top: 6px; }
+.tp-info-box {
+  background: #1e2a1e; border: 1px solid #2a4a2a;
+  border-radius: 5px; padding: 10px 14px; font-size: 12px;
+  color: #8bc88b; margin-bottom: 12px; line-height: 1.7;
+}
+.tp-stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px; margin: 12px 0;
+}
+.tp-stat-item {
+  background: rgba(86,180,255,0.08);
+  border: 1px solid rgba(86,180,255,0.2);
+  border-radius: 6px; padding: 14px; text-align: center;
+}
+.tp-stat-item .tsi-label { font-size: 12px; color: var(--hint-color); }
+.tp-stat-item .tsi-val { font-size: 28px; font-weight: 700; font-family: var(--mono); color: var(--accent2); margin-top: 4px; }
+.stu-list-item {
+  background: #1c1f30; border: 1.5px solid var(--border);
+  border-radius: 5px; padding: 12px; margin-bottom: 8px;
+  cursor: pointer; transition: all 0.15s;
+}
+.stu-list-item:hover { border-color: var(--accent2); background: #22253a; }
+.stu-list-item .sli-hdr { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.stu-list-item .sli-name { font-size: 15px; font-weight: 700; color: var(--accent2); font-family: var(--mono); }
+.stu-list-item .sli-score { font-size: 14px; font-family: var(--mono); }
+.stu-list-item .sli-detail { font-size: 12px; color: var(--hint-color); margin-top: 4px; }
+.stu-sub-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--mono); margin-top: 10px; }
+.stu-sub-table th { background: #0d0f1a; color: #c0c8f0; padding: 6px 8px; border: 1px solid var(--border); }
+.stu-sub-table td { padding: 5px 8px; border: 1px solid var(--grid); color: var(--ink); }
 
-.student-card { background:var(--input-bg); border:1.5px solid var(--border); border-radius:5px; padding:12px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; }
-.student-card:hover { border-color:var(--accent2); background:#161926; }
-.sc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-.sc-name { font-size:15px; font-weight:700; color:var(--accent2); font-family:var(--mono); }
-.sc-stats { font-size:12px; color:var(--hint-color); font-family:var(--mono); }
-.sc-detail { font-size:12px; color:var(--hint-color); font-family:var(--mono); margin-top:4px; }
-
-.btn-tp { padding:8px 16px; border:none; border-radius:4px; font-size:13px; font-family:var(--mono); font-weight:700; cursor:pointer; letter-spacing:0.04em; transition:all 0.15s; }
-.btn-tp-ok { background:#1a4030; color:var(--ok); border:1px solid var(--ok); }
-.btn-tp-ok:hover { background:var(--ok); color:#000; }
-.btn-tp-warn { background:#3a2a00; color:var(--warn); border:1px solid var(--warn); }
-.btn-tp-warn:hover { background:var(--warn); color:#000; }
-.btn-tp-err { background:#3a1a1a; color:var(--err); border:1px solid var(--err); }
-.btn-tp-err:hover { background:var(--err); color:#fff; }
-.btn-tp-blue { background:#0d2040; color:var(--accent2); border:1px solid var(--accent2); }
-.btn-tp-blue:hover { background:var(--accent2); color:#000; }
-.tp-btn-bar { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+@media (max-width: 700px) {
+  .teacher-panel { padding: 16px; }
+  .score-sub-grid { grid-template-columns: 1fr 1fr; }
+  .tp-stats-grid { grid-template-columns: 1fr 1fr; }
+}
 user-select: none
 </style>
 </head>
 <body>
 
-<!-- ══════ 学生登录覆盖层 ══════ -->
-<div class="overlay" id="loginOverlay">
-  <div class="overlay-box">
-    <h2>🎓 学生身份验证</h2>
+<!-- ══ 学生登录遮罩 ══ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>🔧 汽车膜片弹簧离合器优化设计工具</h2>
     <div class="desc">
-      欢迎使用膜片弹簧离合器优化设计工具！<br>
-      请输入学号与姓名，系统将自动生成评分报告。
+      欢迎！本工具基于序列二次规划法（SQP）进行7变量汽车膜片弹簧离合器优化。<br>
+      请先输入您的学号和姓名，完成后系统将生成智能评分报告。
     </div>
     <div class="login-field">
       <label>学号（10位数字）</label>
-      <input type="text" id="inp_stuId" placeholder="例如：2024012345" maxlength="10" autocomplete="off">
-      <div class="hint">必须为10位纯数字</div>
-      <div class="err" id="err_stuId">请输入正确的10位数字学号</div>
+      <input type="text" id="li_studentId" placeholder="请输入10位数字学号" maxlength="10"
+             oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      <div class="hint">示例：2024012345</div>
+      <div class="err-msg" id="li_idErr">请输入准确的10位数字学号</div>
     </div>
     <div class="login-field">
       <label>姓名</label>
-      <input type="text" id="inp_stuName" placeholder="请输入真实姓名">
-      <div class="hint">用于报告标识，请勿填写昵称</div>
-      <div class="err" id="err_stuName">姓名不能少于2个字符</div>
+      <input type="text" id="li_studentName" placeholder="请输入您的真实姓名">
+      <div class="hint">用于报告和教师管理系统</div>
+      <div class="err-msg" id="li_nameErr">姓名至少需要2个字符</div>
     </div>
-    <button class="login-submit" onclick="doStudentLogin()">▶ 开始使用</button>
+    <button class="login-btn" onclick="submitLogin()">✅ 进入设计系统</button>
   </div>
 </div>
 
-<!-- ══════ 教师登录覆盖层 ══════ -->
-<div class="overlay" id="teacherLoginOverlay" style="display:none">
-  <div class="overlay-box">
+<!-- ══ 教师登录遮罩 ══ -->
+<div class="login-overlay" id="teacherLoginOverlay" style="display:none">
+  <div class="login-box">
     <h2>🔐 教师管理系统</h2>
-    <div class="desc">请输入教师密码进入统计管理界面</div>
+    <div class="desc">请输入教师密码以访问统计管理功能</div>
     <div class="login-field">
       <label>教师密码</label>
-      <input type="password" id="inp_teacherPwd" placeholder="请输入密码" onkeydown="if(event.key==='Enter')doTeacherLogin()">
+      <input type="password" id="li_teacherPwd" placeholder="请输入密码"
+             onkeydown="if(event.key==='Enter')submitTeacherLogin()">
       <div class="hint"></div>
-      <div class="err" id="err_teacherPwd">密码错误，请重试</div>
+      <div class="err-msg" id="li_pwdErr">密码错误，请重试</div>
     </div>
-    <button class="login-submit" onclick="doTeacherLogin()">🔓 登录</button>
-    <button class="login-cancel" onclick="closeTeacherLogin()">取消</button>
+    <button class="login-btn" onclick="submitTeacherLogin()">登录</button>
+    <button class="login-btn secondary" onclick="closeTeacherLogin()">取消</button>
   </div>
 </div>
 
@@ -535,12 +625,12 @@ user-select: none
       <h1>汽车膜片弹簧离合器优化设计工具·广西大学 ·车辆工程专业 ·《汽车设计》课程教学团队</h1>
       <div class="sub">基于序列二次规划法（SQP）· 7变量 · 14线性约束 · 2非线性约束 · 实验版</div>
     </div>
-    <div id="studentBadge" class="hdr-student" style="display:none">
-      <div class="s-label">当前学生</div>
-      <div class="s-val" id="badge_name_id"></div>
+    <div class="badge">OFFLINE · SQP · v2.0</div>
+    <div class="stu-badge" id="stuBadge" style="display:none">
+      <div class="sb-label">当前学生</div>
+      <div class="sb-val"><span id="dispName">--</span> &nbsp;(<span id="dispId">--</span>)</div>
     </div>
-    <div class="hdr-teacher-btn" onclick="openTeacherLogin()">👨‍🏫 教师管理</div>
-    <div class="badge">OFFLINE · SQP · v1.5</div>
+    <div class="teacher-hdr-btn" onclick="openTeacherLogin()">👨‍🏫 教师管理</div>
   </div>
 </div>
 
@@ -785,12 +875,12 @@ user-select: none
     或点击「仅评估当前参数」查看初始状态下的特性曲线和约束情况
   </div>
 
-  <!-- ═════ 智能评分报告面板 ═════ -->
-  <div class="panel" id="scorePanel" style="display:none">
+  <!-- ══ 智能评分报告面板（v15智能评分） ══ -->
+  <div class="panel" id="scoreReportPanel" style="display:none">
     <div class="panel-hdr"><span class="dot"></span>📊 智能评分报告</div>
     <div class="panel-body">
       <div id="scoreHero"></div>
-      <div id="scoreDetails"></div>
+      <div id="scoreDetails" style="overflow-x:auto"></div>
       <div style="margin-top:14px">
         <div class="section-title">▸ 改进建议</div>
         <div class="advice-box" id="scoreAdvice"></div>
@@ -801,7 +891,7 @@ user-select: none
         <strong style="color:var(--warn)">请将 TXT 文件提交给教师！</strong>
       </div>
       <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-sec" onclick="generateScoreReport()" id="btnGenReport">📥 生成评分报告文件</button>
+        <button class="btn btn-sec" onclick="generateClutchReport()" id="btnGenReport">📥 生成评分报告文件</button>
         <button class="btn btn-sec" onclick="reCalcScore()" style="background:#1a2a10;border-color:var(--ok);color:var(--ok)">🔄 重新计算评分</button>
       </div>
     </div>
@@ -884,30 +974,32 @@ function stresses(x) {
   const E1 = P.E1(), miu = P.miu();
   const H = x[0], h = x[1], R = x[2], r = x[3], R1 = x[4], r1 = x[5], lamB = x[6];
   const rf = P.rf(), n = P.n_fin(), bz = P.bz();
-  const ff = (R1 - r1) / (r1 - rf);
-  const lamC = lamB / ff;
+  const ff   = (R1 - r1) / (r1 - rf);          // 杠杆比 (R₁-r₁)/(r₁-rf)
+  const lamC = x[6] + P.dt();                   // [修正一] C点变形量 λC = λB + δt
   const lamA = lamB - P.ds();
 
-  const F1C = F1C_val(x);
+  const F1C = F1C_val(x);                        // C点弹簧弹力（已由Fix1修正）
+  const F2C = F2C_val(x);                        // 分离操纵力 F₂C = F₁C·(R₁-r₁)/(r₁-rf)
 
-  // σ_tB — tangential stress in disc spring body (式2-28)
-  // Result is NEGATIVE (compression) — do NOT take absolute value
-  const kk  = E1 / ((1 - miu*miu) * r);
-  const e_np = (R - r) / Math.log(R/r);
-  const tt   = 0.5 * (e_np - r);
-  const alfa = Math.atan(H / (R - r));
-  const fa   = alfa + 0.5 * h / (e_np - r);
-  const sigma_t = kk * (tt*fa*fa - (2*tt*alfa + h/2)*fa);  // negative (compression)
+  // σ_tB — 碟簧部分切向应力（式2-28），结果为负值（压缩）
+  const kk   = E1 / ((1 - miu*miu) * r);
+  const e_np = (R - r) / Math.log(R/r);          // 中性层半径 e
+  const alfa = Math.atan(H / (R - r));            // 圆锥底角 α (rad)
+  // [修正二] 式2-29：φ取 min(φf, φP)，不得无条件使用 φP
+  const phi_f = lamB / (R1 - r1);                // B点实际子午转角 φf
+  const phi_P = alfa + 0.5 * h / (e_np - r);    // 临界转角 φP（式2-29）
+  const fa    = Math.min(phi_f, phi_P);           // 取小值作为计算用转角 φ
+  const tt    = 0.5 * (e_np - r);
+  const sigma_t = kk * (tt*fa*fa - (2*tt*alfa + h/2)*fa);  // 负值（压缩）
 
-  // σ_rB — bending stress at diaphragm finger root (式2-30), positive
-  const sigma_r = 6 * (r - rf) * F1C / (n * bz * h * h);
+  // σ_rB — 分离指根部弯曲应力（式2-30），正值
+  // [修正三] 教材式2-30 使用分离操纵力 F₂C，不是 F₁C
+  const sigma_r = 6 * (r - rf) * F2C / (n * bz * h * h);
 
-  // 式2-31: σ_jB = σ_rB − σ_tB  (σ_tB < 0, so σ_jB = σ_rB + |σ_tB|, range 1500~1700 MPa)
+  // 式2-31: σ_jB = σ_rB − σ_tB  (σ_tB < 0 → σ_jB = σ_rB + |σ_tB|, 应在1500~1700 MPa)
   const sigma_j = sigma_r - sigma_t;
 
-  // confun c(1) displayed as: σ_r − σ_t ≤ 1500  (σ_j - 1500 ≤ 0)
-  // σ_t is negative so σ_j = σ_r + |σ_t| >> 1500 → non-binding in practice
-  const confun_c1 = sigma_j - 1700;  // = sigma_r - sigma_t - 1700
+  const confun_c1 = sigma_j - 1700;
 
   return { sigma_t, sigma_r, sigma_j, confun_c1, F1C, lamC, lamA, ff };
 }
@@ -975,17 +1067,10 @@ function F1A_val(x) {
 }
 
 function F1C_val(x) {
-  // Working point C: separation, lamC = lamB/ff, denominator uses (r1-rf)
-  const E1=P.E1(), miu=P.miu(), rf=P.rf();
-  const H=x[0],h=x[1],R=x[2],r=x[3],R1=x[4],r1=x[5],lamB=x[6];
-  const ff  = (R1-r1)/(r1-rf);
-  const lamC = lamB/ff;
-  const aa2 = Math.PI*E1*h*lamC / (6*(1-miu*miu));
-  const bb2 = Math.log(R/r) / Math.pow(r1-rf, 2);
-  const cc2 = H - lamC*(R-r)/(r1-rf);
-  const dd2 = H - 0.5*lamC*(R-r)/(r1-rf);
-  const ee  = h*h;
-  return aa2*bb2*(cc2*dd2+ee);
+  // [修正] C点工况：压盘分离后，加载半径处变形量 λC = λB + δt（分离行程）
+  // 使用与 F1B/F1A 完全相同的标准公式，分母仍为 (R₁-r₁)²
+  const lamC = x[6] + P.dt();   // λC = λB + δt
+  return F1(lamC, x);
 }
 
 function F2C_val(x) {
@@ -1315,16 +1400,16 @@ function drawChart(xBefore, xAfter) {
   const ds = P.ds(), dt = P.dt();
 
   // ── Working points (B-end coordinate system, as in textbook Fig 2-17)
-  // A: λ_A = λ_B - δs  (wear limit, left of B)
-  // B: λ_B              (new disc working point)
-  // C: λ_C = λ_B + δt  (separation point, right of B; F1C from Eq.2-24 rf-end)
+  // A: λ_A = λ_B - δs  (磨损极限，B点左侧)
+  // B: λ_B              (新摩擦片工作点)
+  // C: λ_C = λ_B + δt  (分离点，B点右侧，标准公式 F₁(λC))
   const wpts = (x) => {
     const lamB = x[6];
     return {
       lamA: lamB - ds,
       lamB,
-      lamC: lamB + dt,   // C position on B-end x-axis = λB + δt
-      F1C_actual: F1C_val(x)   // F1C from rf-end formula (Eq.2-24)
+      lamC: lamB + dt,        // C点变形量 = λB + δt（分离行程）
+      F1C_actual: F1C_val(x)  // C点弹力（已修正：标准公式，分母为(R₁-r₁)²）
     };
   };
   const wp0 = wpts(xBefore);
@@ -1761,76 +1846,450 @@ function renderResults(x0, xOpt) {
 
   // ── Chart
   drawChart(x0, noOpt ? null : xShow);
-
-  // ── Auto scoring report
-  // Use rounded values if available, otherwise use optimized (or x0)
-  const xForScore = (() => {
-    try {
-      const rnd = VAR_IDS.map(id => {
-        const el = document.getElementById('rnd_'+id);
-        return el && +el.value ? +el.value : (noOpt ? x0[VAR_IDS.indexOf(id)] : xShow[VAR_IDS.indexOf(id)]);
-      });
-      return rnd;
-    } catch(e) { return noOpt ? x0 : xShow; }
-  })();
-  const scoreLabel = noOpt ? '初始参数' : '优化后参数';
-  const scoreResult = computeClutchScore(xForScore, !noOpt);
-  renderScoreReport(scoreResult, scoreLabel);
 }
 
 // ════════════════════════════════════════════════════════
-// STUDENT / TEACHER LOGIN
+// MAIN ENTRY POINTS
 // ════════════════════════════════════════════════════════
-const TEACHER_PASSWORD = 'gxuqpp123';
-let appState = { studentId: '', studentName: '', isTeacher: false };
-let teacherData = [];
+function log(msg, type='') {
+  const box = document.getElementById('logBox');
+  const cls = type?`log-${type}`:'';
+  box.innerHTML += `<span class="${cls}">${msg}\n</span>`;
+  box.scrollTop = box.scrollHeight;
+}
 
-function doStudentLogin() {
-  const id   = document.getElementById('inp_stuId').value.trim();
-  const name = document.getElementById('inp_stuName').value.trim();
-  const errId   = document.getElementById('err_stuId');
-  const errName = document.getElementById('err_stuName');
+async function runOptimize() {
+  const x0 = getX0();
+  const maxIter = +document.getElementById('p_maxIter').value;
+  const tol = +document.getElementById('p_tol').value;
+
+  document.getElementById('btnRun').disabled = true;
+  document.getElementById('progressPanel').style.display = 'block';
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('hintBox').style.display = 'none';
+
+  const fac_val = parseFloat(document.getElementById('r_fac').value);
+  log('═══ 膜片弹簧离合器双目标 SQP 优化 ═══', 'info');
+  log(`初值: H=${x0[0]}, h=${x0[1]}, R=${x0[2]}, r=${x0[3]}, R₁=${x0[4]}, r₁=${x0[5]}, λB=${x0[6]}`);
+  const oc_init = objComponents(x0);
+  log(`目标: ${document.getElementById('p_objMode').options[document.getElementById('p_objMode').selectedIndex].text}`);
+  log(`加权系数 fac = ${fac_val.toFixed(2)}`);
+  log(`初始 f₁=|F₁B-F₁A| = ${oc_init.f1.toFixed(2)} N  |  f₂=F₁C = ${oc_init.f2.toFixed(2)} N`);
+  log(`初始总目标 f = ${objective(x0).toFixed(4)}`);
+  const cst0 = evalConstraints(x0);
+  const vio0 = [...cst0.lin,...cst0.nonlin].filter(c=>c.val>c.lim+1e-6).length;
+  log(`初始违反约束数: ${vio0}`, vio0>0?'warn':'');
+  log('─'.repeat(60));
+
+  try {
+    const xOpt = await sqpOptimize(
+      x0, maxIter, tol,
+      (msg) => log(msg),
+      (pct) => {
+        document.getElementById('pFill').style.width = (pct*100)+'%';
+        document.getElementById('pLabel').textContent = `优化进度 ${(pct*100).toFixed(0)}%`;
+      }
+    );
+
+    const cstFinal = evalConstraints(xOpt);
+    const vioFinal = [...cstFinal.lin,...cstFinal.nonlin].filter(c=>c.val>c.lim+1e-6).length;
+    const oc_final = objComponents(xOpt);
+    log(`\n最优解: [${xOpt.map(v=>v.toFixed(4)).join(', ')}]`, 'info');
+    log(`最优 f₁ = ${oc_final.f1.toFixed(2)} N  |  f₂ = ${oc_final.f2.toFixed(2)} N`, 'info');
+    log(`最优总目标 f = ${objective(xOpt).toFixed(4)}`, 'info');
+    log(`最终违反约束数: ${vioFinal}`, vioFinal>0?'warn':'info');
+    if (vioFinal > 0) {
+      log('⚠ 部分约束仍有违反，建议调整初值后重新运行', 'warn');
+    }
+
+    renderResults(x0, xOpt);
+    updateScoreReport(x0, xOpt);
+  } catch(e) {
+    log('✗ 优化出错: ' + e.message, 'err');
+  }
+
+  document.getElementById('btnRun').disabled = false;
+  document.getElementById('pLabel').textContent = '优化完成';
+}
+
+function evalCurrent() {
+  const x0 = getX0();
+  document.getElementById('hintBox').style.display = 'none';
+  document.getElementById('progressPanel').style.display = 'none';
+  renderResults(x0, null);
+  updateScoreReport(x0, null);
+}
+
+// Init
+resetToDefault();
+
+// ════════════════════════════════════════════════════════
+// NEW FEATURES: 学生登录 · 智能评分 · 教师管理
+// ════════════════════════════════════════════════════════
+
+// ── 配置 ──────────────────────────────────────────────
+const TEACHER_PASSWORD_CLUTCH = 'gxuqpp123'; // 教师密码（可修改）
+let clutchTeacherData = [];     // 教师导入的学生数据
+// 评分状态变量（见下方智能评分系统）
+
+// 全局状态
+const clutchState = {
+  studentId: '',
+  studentName: '',
+  isTeacher: false
+};
+
+// ── 学生登录 ────────────────────────────────────────────
+function submitLogin() {
+  const id   = document.getElementById('li_studentId').value.trim();
+  const name = document.getElementById('li_studentName').value.trim();
+  const idErr   = document.getElementById('li_idErr');
+  const nameErr = document.getElementById('li_nameErr');
   let ok = true;
 
-  if (!/^\d{10}$/.test(id)) { errId.style.display = 'block'; ok = false; }
-  else errId.style.display = 'none';
+  if (!/^\d{10}$/.test(id)) { idErr.style.display = 'block'; ok = false; }
+  else idErr.style.display = 'none';
 
-  if (name.length < 2) { errName.style.display = 'block'; ok = false; }
-  else errName.style.display = 'none';
+  if (name.length < 2) { nameErr.style.display = 'block'; ok = false; }
+  else nameErr.style.display = 'none';
 
   if (!ok) return;
 
-  appState.studentId   = id;
-  appState.studentName = name;
+  clutchState.studentId   = id;
+  clutchState.studentName = name;
 
-  document.getElementById('badge_name_id').textContent = `${name}（${id}）`;
-  document.getElementById('studentBadge').style.display = 'block';
+  document.getElementById('dispId').textContent   = id;
+  document.getElementById('dispName').textContent = name;
+  document.getElementById('stuBadge').style.display = 'block';
   document.getElementById('loginOverlay').style.display = 'none';
+
+  // 评分报告将在下次生成时自动读取 clutchState 中的学生信息
 }
 
+// ── 教师登录 ────────────────────────────────────────────
 function openTeacherLogin() {
   document.getElementById('teacherLoginOverlay').style.display = 'flex';
-  document.getElementById('inp_teacherPwd').value = '';
-  document.getElementById('err_teacherPwd').style.display = 'none';
+  document.getElementById('li_teacherPwd').value = '';
+  document.getElementById('li_pwdErr').style.display = 'none';
+  setTimeout(() => document.getElementById('li_teacherPwd').focus(), 100);
 }
 function closeTeacherLogin() {
   document.getElementById('teacherLoginOverlay').style.display = 'none';
 }
-function doTeacherLogin() {
-  const pwd = document.getElementById('inp_teacherPwd').value;
-  if (pwd === TEACHER_PASSWORD) {
-    appState.isTeacher = true;
+function submitTeacherLogin() {
+  const pwd = document.getElementById('li_teacherPwd').value;
+  if (pwd === TEACHER_PASSWORD_CLUTCH) {
+    clutchState.isTeacher = true;
     document.getElementById('teacherLoginOverlay').style.display = 'none';
     showTeacherPanel();
   } else {
-    document.getElementById('err_teacherPwd').style.display = 'block';
+    document.getElementById('li_pwdErr').style.display = 'block';
   }
 }
 
+// ── 教师统计面板 ─────────────────────────────────────────
+function showTeacherPanel() {
+  // 移除旧面板（如果存在）
+  const old = document.getElementById('clutchTeacherPanel');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'teacher-overlay';
+  overlay.id = 'clutchTeacherPanel';
+
+  overlay.innerHTML = `
+  <div class="teacher-panel">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h2>📊 教师统计管理系统（离线版）</h2>
+        <div class="tp-sub">膜片弹簧离合器优化设计 · 批量导入学生报告 · 自动统计分析</div>
+      </div>
+      <button class="btn btn-sec" style="font-size:13px;padding:8px 18px" onclick="closeClutchTeacherPanel()">✕ 关闭</button>
+    </div>
+
+    <div class="tp-card">
+      <div class="tp-card-title">📁 导入学生数据文件</div>
+      <div class="tp-info-box">
+        <strong>使用说明：</strong><br>
+        1. 收集所有学生提交的 <strong>TXT 报告文件</strong>（由学生点击"生成完整报告"下载）<br>
+        2. 点击下方区域或拖拽文件批量导入（支持多文件同时拖入）<br>
+        3. 系统自动从 TXT 文件中提取 JSON 评分数据，生成班级统计<br>
+        4. 点击"导出CSV"可在 Excel 中进行进一步分析
+      </div>
+      <input type="file" id="clutchFileInput" multiple accept=".txt,.json"
+             style="display:none" onchange="handleClutchFileSelect(event)">
+      <div class="tp-upload-zone" id="clutchUploadZone"
+           onclick="document.getElementById('clutchFileInput').click()">
+        <div class="uiz">📂</div>
+        <div class="uit">点击选择文件 或 拖拽文件到此处</div>
+        <div class="uih">支持批量导入 TXT 或 JSON 文件 · 文件不会离开您的设备</div>
+      </div>
+      <div id="clutchUploadStatus" style="margin-top:10px;font-size:13px;color:var(--label-color)"></div>
+    </div>
+
+    <div id="clutchStatsContent"></div>
+  </div>`;
+
+  document.body.appendChild(overlay);
+
+  // 拖拽支持
+  const zone = overlay.querySelector('#clutchUploadZone');
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    handleClutchFileSelect({ target: { files: e.dataTransfer.files } });
+  });
+
+  // 关闭时点击遮罩
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeClutchTeacherPanel(); });
+
+  if (clutchTeacherData.length > 0) displayClutchStats();
+}
+
+function closeClutchTeacherPanel() {
+  const p = document.getElementById('clutchTeacherPanel');
+  if (p) p.remove();
+}
+
+// ── 文件导入 ────────────────────────────────────────────
+function handleClutchFileSelect(event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+
+  const statusDiv = document.getElementById('clutchUploadStatus');
+  if (statusDiv) statusDiv.innerHTML = '<span style="color:var(--accent2)">正在处理文件…</span>';
+
+  let loaded = 0, errors = 0;
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const content = e.target.result;
+        let data = null;
+
+        if (file.name.endsWith('.txt')) {
+          const match = content.match(/--- SYSTEM DATA BEGIN ---\s*([\s\S]*?)\s*--- SYSTEM DATA END ---/);
+          if (match && match[1]) data = JSON.parse(match[1].trim());
+          else { errors++; return; }
+        } else if (file.name.endsWith('.json')) {
+          data = JSON.parse(content);
+        } else { errors++; return; }
+
+        if (data && data.studentId && data.studentName && data.totalScore !== undefined
+            && data.reportType === 'clutch_design') {
+          // 避免重复导入（相同学号+时间戳）
+          const dup = clutchTeacherData.find(d => d.studentId === data.studentId && d.timestamp === data.timestamp);
+          if (!dup) { clutchTeacherData.push(data); loaded++; }
+          else loaded++; // 计入 loaded 但不重复添加
+        } else errors++;
+      } catch(err) { errors++; }
+
+      if (loaded + errors === files.length) {
+        if (statusDiv) statusDiv.innerHTML =
+          `<span style="color:var(--ok)">✓ 成功处理 ${loaded} 个文件</span>` +
+          (errors > 0 ? `<span style="color:var(--err);margin-left:12px">✗ ${errors} 个文件失败或格式不符</span>` : '');
+        if (loaded > 0) displayClutchStats();
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+// ── 统计分析与显示 ──────────────────────────────────────
+function analyzeClutchData(data) {
+  const map = {};
+  data.forEach(rec => {
+    const id = rec.studentId;
+    if (!map[id]) map[id] = {
+      studentId: id, studentName: rec.studentName,
+      submissions: [], count: 0, totalScore: 0,
+      maxScore: 0, minScore: 100, firstTime: null, lastTime: null
+    };
+    const s = map[id];
+    s.submissions.push(rec); s.count++;
+    s.totalScore += rec.totalScore;
+    s.maxScore = Math.max(s.maxScore, rec.totalScore);
+    s.minScore = Math.min(s.minScore, rec.totalScore);
+    const t = new Date(rec.timestamp);
+    if (!s.firstTime || t < s.firstTime) s.firstTime = t;
+    if (!s.lastTime  || t > s.lastTime)  s.lastTime  = t;
+  });
+  const students = Object.values(map);
+  students.forEach(s => {
+    s.avgScore = s.totalScore / s.count;
+    s.submissions.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+  });
+  const avg = students.length ? students.reduce((acc,s) => acc + s.avgScore, 0) / students.length : 0;
+  return {
+    totalStudents: students.length, totalSubmissions: data.length,
+    avgScore: avg,
+    students: students.sort((a,b) => a.studentId.localeCompare(b.studentId))
+  };
+}
+
+function displayClutchStats() {
+  const stats  = analyzeClutchData(clutchTeacherData);
+  const cont   = document.getElementById('clutchStatsContent');
+  if (!cont) return;
+
+  const dist = [0,0,0,0,0]; // 90+, 80-89, 70-79, 60-69, <60
+  stats.students.forEach(s => {
+    if (s.avgScore >= 90) dist[0]++;
+    else if (s.avgScore >= 80) dist[1]++;
+    else if (s.avgScore >= 70) dist[2]++;
+    else if (s.avgScore >= 60) dist[3]++;
+    else dist[4]++;
+  });
+
+  cont.innerHTML = `
+  <div class="tp-card">
+    <div class="tp-card-title">📈 班级总体统计</div>
+    <div class="tp-stats-grid">
+      <div class="tp-stat-item"><div class="tsi-label">学生总数</div><div class="tsi-val">${stats.totalStudents}</div></div>
+      <div class="tp-stat-item"><div class="tsi-label">提交总次数</div><div class="tsi-val">${stats.totalSubmissions}</div></div>
+      <div class="tp-stat-item"><div class="tsi-label">班级平均分</div><div class="tsi-val">${stats.avgScore.toFixed(1)}</div></div>
+      <div class="tp-stat-item"><div class="tsi-label">优秀（≥90）</div><div class="tsi-val">${dist[0]}</div></div>
+      <div class="tp-stat-item"><div class="tsi-label">良好（80~89）</div><div class="tsi-val">${dist[1]}</div></div>
+      <div class="tp-stat-item"><div class="tsi-label">中等（70~79）</div><div class="tsi-val">${dist[2]}</div></div>
+      <div class="tp-stat-item"><div class="tsi-label">及格（60~69）</div><div class="tsi-val">${dist[3]}</div></div>
+      <div class="tp-stat-item"><div class="tsi-label">不及格（<60）</div><div class="tsi-val">${dist[4]}</div></div>
+    </div>
+  </div>
+
+  <div class="tp-card">
+    <div class="tp-card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <span>👥 学生列表（点击展开详情）</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sec" style="font-size:12px;padding:6px 12px" onclick="exportClutchCSV()">📊 导出汇总CSV</button>
+        <button class="btn btn-sec" style="font-size:12px;padding:6px 12px" onclick="exportClutchDetailCSV()">📋 导出详细记录</button>
+        <button class="btn" style="background:#3a1010;color:var(--err);border:1px solid var(--err);font-size:12px;padding:6px 12px"
+                onclick="clearClutchData()">🗑️ 清空数据</button>
+      </div>
+    </div>
+    <div id="clutchStudentList" style="max-height:500px;overflow-y:auto;margin-top:10px"></div>
+  </div>`;
+
+  // 渲染学生列表
+  const listEl = document.getElementById('clutchStudentList');
+  if (!listEl) return;
+  if (stats.students.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--hint-color)">暂无数据</div>';
+    return;
+  }
+  listEl.innerHTML = stats.students.map(s => {
+    const g = s.avgScore >= 90 ? '优秀' : s.avgScore >= 80 ? '良好' : s.avgScore >= 70 ? '中等' : s.avgScore >= 60 ? '及格' : '不及格';
+    const gc = s.avgScore >= 80 ? 'var(--ok)' : s.avgScore >= 60 ? 'var(--warn)' : 'var(--err)';
+    return `
+    <div class="stu-list-item" onclick="toggleClutchDetail('${s.studentId}')">
+      <div class="sli-hdr">
+        <span class="sli-name">${s.studentName} (${s.studentId})</span>
+        <span class="sli-score" style="color:${gc}">平均 ${s.avgScore.toFixed(1)} 分（${g}）· 提交 ${s.count} 次</span>
+      </div>
+      <div class="sli-detail">
+        最高：${s.maxScore} 分 | 最低：${s.minScore} 分 |
+        首次：${s.firstTime.toLocaleString('zh-CN')} | 最后：${s.lastTime.toLocaleString('zh-CN')}
+      </div>
+      <div id="clutchDetail_${s.studentId}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--grid)">
+        <table class="stu-sub-table">
+          <thead><tr>
+            <th>#</th><th>提交时间</th><th>总分</th>
+            <th>传矩能力/25</th><th>弹性特性/30</th><th>分离操纵/20</th><th>强度应力/15</th><th>约束满足/10</th><th>等级</th>
+          </tr></thead>
+          <tbody>
+            ${s.submissions.map((sub,idx) => {
+              const sg = sub.totalScore >= 90 ? '优秀' : sub.totalScore >= 80 ? '良好' : sub.totalScore >= 70 ? '中等' : sub.totalScore >= 60 ? '及格' : '不及格';
+              return `<tr>
+                <td>${idx+1}</td>
+                <td>${new Date(sub.timestamp).toLocaleString('zh-CN')}</td>
+                <td><strong>${sub.totalScore}</strong></td>
+                <td>${sub.scores.s1||'-'}</td><td>${sub.scores.s2||'-'}</td>
+                <td>${sub.scores.s3||'-'}</td><td>${sub.scores.s4||'-'}</td><td>${sub.scores.s5||'-'}</td>
+                <td>${sg}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleClutchDetail(id) {
+  const el = document.getElementById('clutchDetail_' + id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function clearClutchData() {
+  if (confirm('确定清空所有已导入的学生数据？此操作不可恢复！')) {
+    clutchTeacherData = [];
+    displayClutchStats();
+  }
+}
+
+// ── CSV导出 ────────────────────────────────────────────
+function exportClutchCSV() {
+  if (clutchTeacherData.length === 0) { alert('请先导入学生数据！'); return; }
+  const stats = analyzeClutchData(clutchTeacherData);
+  let csv = '\uFEFF学号,姓名,提交次数,平均分,最高分,最低分,等级,首次提交时间,最后提交时间\n';
+  stats.students.forEach(s => {
+    const g = s.avgScore >= 90 ? '优秀' : s.avgScore >= 80 ? '良好' : s.avgScore >= 70 ? '中等' : s.avgScore >= 60 ? '及格' : '不及格';
+    csv += `${s.studentId},${s.studentName},${s.count},${s.avgScore.toFixed(1)},${s.maxScore},${s.minScore},${g},${s.firstTime.toLocaleString('zh-CN')},${s.lastTime.toLocaleString('zh-CN')}\n`;
+  });
+  csv += '\n分数段,人数,占比\n';
+  const dist = [['90-100（优秀）',0],['80-89（良好）',0],['70-79（中等）',0],['60-69（及格）',0],['60分以下（不及格）',0]];
+  stats.students.forEach(s => {
+    if (s.avgScore >= 90) dist[0][1]++;
+    else if (s.avgScore >= 80) dist[1][1]++;
+    else if (s.avgScore >= 70) dist[2][1]++;
+    else if (s.avgScore >= 60) dist[3][1]++;
+    else dist[4][1]++;
+  });
+  dist.forEach(d => {
+    const pct = stats.students.length ? (d[1]/stats.students.length*100).toFixed(1)+'%' : '0%';
+    csv += `${d[0]},${d[1]},${pct}\n`;
+  });
+  downloadClutchCSV(csv, `离合器优化设计_学生统计_${new Date().toISOString().slice(0,10)}.csv`);
+}
+
+function exportClutchDetailCSV() {
+  if (clutchTeacherData.length === 0) { alert('请先导入学生数据！'); return; }
+  const stats = analyzeClutchData(clutchTeacherData);
+  let csv = '\uFEFF学号,姓名,提交时间,总分,传矩能力,弹性特性,分离操纵,强度应力,约束满足,等级\n';
+  stats.students.forEach(s => {
+    s.submissions.forEach(sub => {
+      const g = sub.totalScore >= 90 ? '优秀' : sub.totalScore >= 80 ? '良好' : sub.totalScore >= 70 ? '中等' : sub.totalScore >= 60 ? '及格' : '不及格';
+      csv += `${s.studentId},${s.studentName},${new Date(sub.timestamp).toLocaleString('zh-CN')},${sub.totalScore},${sub.scores.s1||0},${sub.scores.s2||0},${sub.scores.s3||0},${sub.scores.s4||0},${sub.scores.s5||0},${g}\n`;
+    });
+  });
+  downloadClutchCSV(csv, `离合器优化设计_详细记录_${new Date().toISOString().slice(0,10)}.csv`);
+}
+
+function downloadClutchCSV(csvContent, filename) {
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 // ════════════════════════════════════════════════════════
-// INTELLIGENT SCORING ENGINE
+// ════════════════════════════════════════════════════════
+// 智能评分系统（v15 评分逻辑）
+// 评分维度（100分）：
+//   ① 传矩能力验证   /25
+//   ② 弹性特性设计   /30
+//   ③ 分离操纵性评估 /20
+//   ④ 强度与应力验证 /15
+//   ⑤ 约束满足度     /10
 // ════════════════════════════════════════════════════════
 let _lastScoreResult = null;
+let _lastX0 = null;
+let _lastXOpt = null;
 
 function computeClutchScore(x, isOptimized) {
   const oc  = objComponents(x);
@@ -2002,23 +2461,39 @@ function renderScoreReport(result, xLabel) {
   r.sections.forEach(sec => {
     const secScore = sec.items.reduce((s,it) => s+it.score, 0);
     detailHtml += `
-      <div class="section-title" style="margin-top:16px">${sec.title}（${secScore} / ${sec.max} 分）</div>
+      <div class="section-title" style="margin-top:18px;margin-bottom:6px">${sec.title}（${secScore} / ${sec.max} 分）</div>
       <table class="score-table">
-        <thead><tr><th>评分项目</th><th>标准要求</th><th>实际情况</th><th style="text-align:center">状态</th><th style="text-align:center">得分 / 满分</th></tr></thead>
+        <colgroup>
+          <col style="width:22%">
+          <col style="width:24%">
+          <col style="width:30%">
+          <col style="width:10%">
+          <col style="width:14%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>评分项目</th>
+            <th>标准要求</th>
+            <th>实际情况</th>
+            <th style="text-align:center">状态</th>
+            <th style="text-align:center">得分/满分</th>
+          </tr>
+        </thead>
         <tbody>
-          ${sec.items.map(it => `<tr>
+          ${sec.items.map(it => `
+          <tr>
             <td><strong>${it.name}</strong></td>
-            <td style="font-size:12px;color:var(--hint-color)">${it.standard}</td>
-            <td>${it.actual}</td>
-            <td style="text-align:center"><span class="${statusClass[it.status]}">${statusText[it.status]}</span></td>
-            <td style="text-align:center"><span class="${it.score===it.max?'badge-ok':it.score>0?'badge-warn':'badge-vio'}">${it.score}/${it.max}</span></td>
+            <td style="font-size:12px;color:var(--hint-color);line-height:1.5">${it.standard}</td>
+            <td style="line-height:1.5">${it.actual}</td>
+            <td style="text-align:center;white-space:nowrap"><span class="${statusClass[it.status]}">${statusText[it.status]}</span></td>
+            <td style="text-align:center;white-space:nowrap"><span class="${it.score===it.max?'badge-ok':it.score>0?'badge-warn':'badge-vio'}">${it.score}/${it.max}</span></td>
           </tr>`).join('')}
         </tbody>
       </table>`;
   });
   document.getElementById('scoreDetails').innerHTML = detailHtml;
 
-  // Advice
+  // Advice — 每条独立一行（<p> 块级元素）
   const advices = [];
   if (r.F1b < r.F_req)        advices.push('📌 <strong>传矩不足：</strong>F₁B 小于所需压紧力 F_req，需调大 λB 或增大 H/h 比。');
   if (r.f1 > 200)              advices.push('📌 <strong>压紧力稳定性差：</strong>|F₁B−F₁A| 过大，考虑减小 δs 或重新优化目标函数权重（加大 fac）。');
@@ -2028,14 +2503,27 @@ function renderScoreReport(result, xLabel) {
   if (r.violations > 0)        advices.push(`📌 <strong>有 ${r.violations} 项约束未满足：</strong>请检查约束校核表，调整设计变量使所有约束满足后再提交。`);
   if (r.F2c > 220)             advices.push(`📌 <strong>分离操纵力偏大：</strong>F₂C = ${fmt(r.F2c,1)} N，可调小 fac 权重以减小分离力。`);
   if (advices.length === 0)    advices.push('✅ 设计参数整体合理，各项指标均达到良好水准！建议继续完善说明书中的计算过程与分析。');
-  document.getElementById('scoreAdvice').innerHTML = advices.join('<br>');
+  // 每条建议单独一个 <p>，保证换行清晰
+  document.getElementById('scoreAdvice').innerHTML =
+    advices.map(a => `<p style="margin:0 0 8px 0">${a}</p>`).join('');
 
-  document.getElementById('scorePanel').style.display = 'block';
-  document.getElementById('scorePanel').scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('scoreReportPanel').style.display = 'block';
+  document.getElementById('scoreReportPanel').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── 桥接函数：从优化/评估流程调用 ─────────────────────────
+function updateScoreReport(x0, xOpt) {
+  _lastX0   = x0;
+  _lastXOpt = xOpt;
+  const xForScore = xOpt || x0;
+  const isOptimized = xOpt !== null;
+  const scoreLabel = isOptimized ? '优化后参数' : '初始参数';
+  const scoreResult = computeClutchScore(xForScore, isOptimized);
+  renderScoreReport(scoreResult, scoreLabel);
 }
 
 function reCalcScore() {
-  // Re-compute from current rounded values
+  // 从圆整值重新计算
   const xRnd = VAR_IDS.map(id => {
     const el = document.getElementById('rnd_'+id);
     return el ? +el.value : +document.getElementById('x_'+id).value;
@@ -2044,16 +2532,20 @@ function reCalcScore() {
   renderScoreReport(result, '圆整后参数');
 }
 
-function generateScoreReport() {
+// 兼容旧调用
+function refreshScore() { reCalcScore(); }
+
+// ── 生成报告文件 ─────────────────────────────────────────
+function generateClutchReport() {
   if (!_lastScoreResult) { alert('请先完成计算并查看评分报告！'); return; }
   const r = _lastScoreResult;
-  if (!appState.studentId) { alert('请先登录（输入学号和姓名）！'); return; }
+  if (!clutchState.studentId) { alert('请先登录（输入学号和姓名）！'); return; }
 
   let rpt = '═══════════════════════════════════════════════════\n';
   rpt += '   膜片弹簧离合器优化设计  —  智能评分报告\n';
   rpt += '═══════════════════════════════════════════════════\n\n';
   rpt += '【学生信息】\n';
-  rpt += `学号：${appState.studentId}\n姓名：${appState.studentName}\n提交时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+  rpt += `学号：${clutchState.studentId}\n姓名：${clutchState.studentName}\n提交时间：${new Date().toLocaleString('zh-CN')}\n\n`;
   rpt += '【总评分】\n';
   rpt += `总分：${r.totalScore} / 100  （${r.grade}）\n`;
   r.sections.forEach(sec => {
@@ -2069,7 +2561,7 @@ function generateScoreReport() {
     });
   });
   rpt += '\n═══════════════════════════════════════════════════\n';
-  rpt += `学号：${appState.studentId}  姓名：${appState.studentName}\n`;
+  rpt += `学号：${clutchState.studentId}  姓名：${clutchState.studentName}\n`;
   rpt += '═══════════════════════════════════════════════════\n\n\n';
   rpt += '--- 以下为系统数据，请勿修改 ---\n--- SYSTEM DATA BEGIN ---\n';
   const scores_dim = {};
@@ -2077,8 +2569,8 @@ function generateScoreReport() {
     scores_dim['s'+(i+1)] = sec.items.reduce((s,it) => s+it.score, 0);
   });
   const jsonData = {
-    studentId: appState.studentId,
-    studentName: appState.studentName,
+    studentId: clutchState.studentId,
+    studentName: clutchState.studentName,
     timestamp: new Date().toISOString(),
     reportType: 'clutch_spring_optimizer',
     totalScore: r.totalScore,
@@ -2099,321 +2591,10 @@ function generateScoreReport() {
   const blob = new Blob([rpt], { type:'text/plain;charset=utf-8' });
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
-  a.download = `离合器评分报告_${appState.studentId}_${appState.studentName}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.download = `离合器评分报告_${clutchState.studentId}_${clutchState.studentName}_${new Date().toISOString().slice(0,10)}.txt`;
   a.click();
   alert(`评分报告已生成！\n总分：${r.totalScore} 分（${r.grade}）\n请将 TXT 文件提交给教师。`);
 }
-
-// ════════════════════════════════════════════════════════
-// TEACHER MANAGEMENT PANEL
-// ════════════════════════════════════════════════════════
-function showTeacherPanel() {
-  // Remove old panel if exists
-  const old = document.getElementById('teacherPanel');
-  if (old) old.remove();
-
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.id = 'teacherPanel';
-
-  const box = document.createElement('div');
-  box.className = 'teacher-panel-box';
-  box.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h2>📊 教师统计管理系统（离线版）</h2>
-      <button class="btn-tp btn-tp-err" onclick="document.getElementById('teacherPanel').remove()">✕ 关闭</button>
-    </div>
-
-    <div class="tp-card">
-      <div class="tp-card-title">📁 导入学生评分文件</div>
-      <div class="info-notice">
-        <strong>使用说明：</strong><br>
-        1. 收集所有学生提交的 <strong>TXT 报告文件</strong>（由本工具生成）<br>
-        2. 点击下方区域或拖拽文件进行批量导入（支持多选）<br>
-        3. 系统自动从 TXT 中提取结构化数据并汇总统计<br>
-        4. 点击「导出CSV」生成 Excel 兼容的统计表格
-      </div>
-      <input type="file" id="tp_fileInput" multiple accept=".txt,.json" style="display:none" onchange="handleTeacherFileSelect(event)">
-      <div class="tp-upload-zone" onclick="document.getElementById('tp_fileInput').click()" id="tp_uploadZone">
-        <div class="tz-icon">📂</div>
-        <div class="tz-text">点击选择文件，或将 TXT 文件拖拽到此处</div>
-        <div class="tz-hint">支持批量导入 · TXT / JSON 格式</div>
-      </div>
-      <div id="tp_uploadStatus" style="margin-top:8px;font-size:13px;font-family:var(--mono);color:var(--label-color)"></div>
-    </div>
-
-    <div id="tp_statsContent"></div>
-  `;
-
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-
-  // Drag-and-drop
-  const zone = box.querySelector('#tp_uploadZone');
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor='var(--accent2)'; });
-  zone.addEventListener('dragleave', () => { zone.style.borderColor=''; });
-  zone.addEventListener('drop', e => {
-    e.preventDefault(); zone.style.borderColor='';
-    handleTeacherFileSelect({ target:{ files: e.dataTransfer.files } });
-  });
-
-  if (teacherData.length > 0) renderTeacherStats();
-}
-
-function handleTeacherFileSelect(event) {
-  const files = event.target.files;
-  if (!files || files.length === 0) return;
-  const statusEl = document.getElementById('tp_uploadStatus');
-  statusEl.innerHTML = '<span style="color:var(--accent2)">正在解析文件…</span>';
-
-  let loaded = 0, failed = 0;
-  Array.from(files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const content = e.target.result;
-        let data = null;
-        if (file.name.endsWith('.txt')) {
-          const m = content.match(/--- SYSTEM DATA BEGIN ---\s*([\s\S]*?)\s*--- SYSTEM DATA END ---/);
-          if (m && m[1]) data = JSON.parse(m[1].trim());
-        } else {
-          data = JSON.parse(content);
-        }
-        if (data && data.studentId && data.totalScore !== undefined &&
-            data.reportType === 'clutch_spring_optimizer') {
-          // Avoid duplicate: same student+timestamp
-          const dup = teacherData.find(d => d.studentId===data.studentId && d.timestamp===data.timestamp);
-          if (!dup) { teacherData.push(data); loaded++; }
-        } else { failed++; }
-      } catch(err) { failed++; }
-
-      if (loaded + failed === files.length) {
-        statusEl.innerHTML = `<span style="color:var(--ok)">✓ 成功导入 ${loaded} 条记录</span>` +
-          (failed ? `<span style="color:var(--err);margin-left:12px">✗ ${failed} 个文件失败或格式不符</span>` : '');
-        if (loaded > 0) renderTeacherStats();
-      }
-    };
-    reader.readAsText(file);
-  });
-}
-
-function renderTeacherStats() {
-  const statsEl = document.getElementById('tp_statsContent');
-  if (!statsEl) return;
-
-  // Aggregate by student
-  const map = {};
-  teacherData.forEach(log => {
-    const id = log.studentId;
-    if (!map[id]) map[id] = { id, name:log.studentName, submissions:[], maxScore:0, minScore:100, totalScore:0 };
-    const s = map[id];
-    s.submissions.push(log);
-    s.totalScore += log.totalScore;
-    s.maxScore = Math.max(s.maxScore, log.totalScore);
-    s.minScore = Math.min(s.minScore, log.totalScore);
-  });
-  const students = Object.values(map);
-  students.forEach(s => { s.avgScore = s.totalScore / s.submissions.length; });
-  students.sort((a,b) => a.id.localeCompare(b.id));
-
-  const totalAvg = students.length ? students.reduce((s,x) => s+x.avgScore, 0) / students.length : 0;
-
-  const distCounts = [0,0,0,0,0];
-  students.forEach(s => {
-    const sc = s.avgScore;
-    if (sc>=90) distCounts[0]++; else if (sc>=80) distCounts[1]++;
-    else if (sc>=70) distCounts[2]++; else if (sc>=60) distCounts[3]++;
-    else distCounts[4]++;
-  });
-
-  statsEl.innerHTML = `
-    <div class="stats-banner">
-      <h3>📈 班级总体统计</h3>
-      <div class="stats-grid">
-        <div class="stat-item"><div class="si-lbl">学生总数</div><div class="si-val">${students.length}</div></div>
-        <div class="stat-item"><div class="si-lbl">提交总次数</div><div class="si-val">${teacherData.length}</div></div>
-        <div class="stat-item"><div class="si-lbl">班级平均分</div><div class="si-val">${totalAvg.toFixed(1)}</div></div>
-        <div class="stat-item"><div class="si-lbl">优秀率（≥90）</div><div class="si-val">${students.length?((distCounts[0]/students.length*100).toFixed(0)+'%'):'—'}</div></div>
-        <div class="stat-item"><div class="si-lbl">及格率（≥60）</div><div class="si-val">${students.length?(((distCounts[0]+distCounts[1]+distCounts[2]+distCounts[3])/students.length*100).toFixed(0)+'%'):'—'}</div></div>
-      </div>
-    </div>
-
-    <div class="tp-card">
-      <div class="tp-card-title">📊 分数段分布</div>
-      <table class="score-table">
-        <thead><tr><th>分数段</th><th>人数</th><th>占比</th></tr></thead>
-        <tbody>
-          ${['90~100（优秀）','80~89（良好）','70~79（中等）','60~69（及格）','60以下（不及格）']
-            .map((lbl,i) => `<tr><td>${lbl}</td><td>${distCounts[i]}</td>
-              <td>${students.length?((distCounts[i]/students.length*100).toFixed(1)+'%'):'—'}</td></tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-
-    <div class="tp-card">
-      <div class="tp-card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span>👥 学生列表</span>
-        <div class="tp-btn-bar" style="margin:0">
-          <button class="btn-tp btn-tp-ok" onclick="exportTeacherCSV()">📊 导出汇总CSV</button>
-          <button class="btn-tp btn-tp-blue" onclick="exportDetailedCSV_teacher()">📋 导出详细记录</button>
-          <button class="btn-tp btn-tp-err" onclick="clearTeacherData()">🗑️ 清空数据</button>
-        </div>
-      </div>
-      <div id="tp_studentList" style="max-height:420px;overflow-y:auto;margin-top:10px">
-        ${students.map(s => {
-          const grade = s.avgScore>=90?'优秀':s.avgScore>=80?'良好':s.avgScore>=70?'中等':s.avgScore>=60?'及格':'不及格';
-          const gc = s.avgScore>=90?'var(--ok)':s.avgScore>=70?'var(--warn)':'var(--err)';
-          return `
-            <div class="student-card" onclick="toggleTeacherDetail('${s.id}')">
-              <div class="sc-header">
-                <div class="sc-name">${s.name} (${s.id})</div>
-                <div class="sc-stats"><span style="color:${gc};font-weight:700">平均 ${s.avgScore.toFixed(1)} 分（${grade}）</span> &nbsp; 提交 ${s.submissions.length} 次</div>
-              </div>
-              <div class="sc-detail">最高分：${s.maxScore} · 最低分：${s.minScore}</div>
-              <div id="td_${s.id}" style="display:none;margin-top:10px;padding-top:8px;border-top:1px solid var(--grid)">
-                <table class="score-table" style="font-size:11px">
-                  <thead><tr><th>#</th><th>提交时间</th><th>总分</th><th>传矩</th><th>弹性</th><th>操纵</th><th>强度</th><th>约束</th><th>是否优化</th></tr></thead>
-                  <tbody>
-                    ${s.submissions.map((sub,idx) => `<tr>
-                      <td>${idx+1}</td>
-                      <td>${new Date(sub.timestamp).toLocaleString('zh-CN')}</td>
-                      <td><strong>${sub.totalScore}</strong></td>
-                      <td>${sub.scores?.s1||'—'}</td><td>${sub.scores?.s2||'—'}</td>
-                      <td>${sub.scores?.s3||'—'}</td><td>${sub.scores?.s4||'—'}</td>
-                      <td>${sub.scores?.s5||'—'}</td>
-                      <td>${sub.isOptimized?'✓ 已优化':'— 仅评估'}</td>
-                    </tr>`).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-}
-
-function toggleTeacherDetail(id) {
-  const el = document.getElementById('td_'+id);
-  if (el) el.style.display = el.style.display==='none' ? 'block' : 'none';
-}
-
-function clearTeacherData() {
-  if (confirm('确定要清空所有已导入的学生数据？此操作不可撤销！')) {
-    teacherData = [];
-    renderTeacherStats();
-  }
-}
-
-function exportTeacherCSV() {
-  if (teacherData.length === 0) { alert('请先导入学生数据！'); return; }
-  const map = {};
-  teacherData.forEach(log => {
-    const id = log.studentId;
-    if (!map[id]) map[id] = { id, name:log.studentName, subs:[], max:0, min:100, total:0 };
-    map[id].subs.push(log); map[id].total += log.totalScore;
-    map[id].max = Math.max(map[id].max, log.totalScore);
-    map[id].min = Math.min(map[id].min, log.totalScore);
-  });
-  const students = Object.values(map).map(s => ({ ...s, avg: s.total/s.subs.length }));
-  students.sort((a,b) => a.id.localeCompare(b.id));
-
-  let csv = '\uFEFF学号,姓名,提交次数,平均分,最高分,最低分,等级\n';
-  students.forEach(s => {
-    const grade = s.avg>=90?'优秀':s.avg>=80?'良好':s.avg>=70?'中等':s.avg>=60?'及格':'不及格';
-    csv += `${s.id},${s.name},${s.subs.length},${s.avg.toFixed(1)},${s.max},${s.min},${grade}\n`;
-  });
-  downloadCSV_teacher(csv, `离合器设计_学生汇总_${new Date().toISOString().slice(0,10)}.csv`);
-}
-
-function exportDetailedCSV_teacher() {
-  if (teacherData.length === 0) { alert('请先导入学生数据！'); return; }
-  let csv = '\uFEFF学号,姓名,提交时间,总分,传矩能力,弹性特性,分离操纵,强度验证,约束满足,是否优化,等级\n';
-  teacherData.forEach(log => {
-    const grade = log.totalScore>=90?'优秀':log.totalScore>=80?'良好':log.totalScore>=70?'中等':log.totalScore>=60?'及格':'不及格';
-    const sc = log.scores || {};
-    csv += `${log.studentId},${log.studentName},${new Date(log.timestamp).toLocaleString('zh-CN')},${log.totalScore},${sc.s1||0},${sc.s2||0},${sc.s3||0},${sc.s4||0},${sc.s5||0},${log.isOptimized?'是':'否'},${grade}\n`;
-  });
-  downloadCSV_teacher(csv, `离合器设计_详细记录_${new Date().toISOString().slice(0,10)}.csv`);
-}
-
-function downloadCSV_teacher(content, filename) {
-  const blob = new Blob([content], { type:'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = filename;
-  a.style.visibility = 'hidden'; document.body.appendChild(a);
-  a.click(); document.body.removeChild(a);
-}
-
-// ════════════════════════════════════════════════════════
-function log(msg, type='') {
-  const box = document.getElementById('logBox');
-  const cls = type?`log-${type}`:'';
-  box.innerHTML += `<span class="${cls}">${msg}\n</span>`;
-  box.scrollTop = box.scrollHeight;
-}
-
-async function runOptimize() {
-  const x0 = getX0();
-  const maxIter = +document.getElementById('p_maxIter').value;
-  const tol = +document.getElementById('p_tol').value;
-
-  document.getElementById('btnRun').disabled = true;
-  document.getElementById('progressPanel').style.display = 'block';
-  document.getElementById('logBox').innerHTML = '';
-  document.getElementById('hintBox').style.display = 'none';
-
-  const fac_val = parseFloat(document.getElementById('r_fac').value);
-  log('═══ 膜片弹簧离合器双目标 SQP 优化 ═══', 'info');
-  log(`初值: H=${x0[0]}, h=${x0[1]}, R=${x0[2]}, r=${x0[3]}, R₁=${x0[4]}, r₁=${x0[5]}, λB=${x0[6]}`);
-  const oc_init = objComponents(x0);
-  log(`目标: ${document.getElementById('p_objMode').options[document.getElementById('p_objMode').selectedIndex].text}`);
-  log(`加权系数 fac = ${fac_val.toFixed(2)}`);
-  log(`初始 f₁=|F₁B-F₁A| = ${oc_init.f1.toFixed(2)} N  |  f₂=F₁C = ${oc_init.f2.toFixed(2)} N`);
-  log(`初始总目标 f = ${objective(x0).toFixed(4)}`);
-  const cst0 = evalConstraints(x0);
-  const vio0 = [...cst0.lin,...cst0.nonlin].filter(c=>c.val>c.lim+1e-6).length;
-  log(`初始违反约束数: ${vio0}`, vio0>0?'warn':'');
-  log('─'.repeat(60));
-
-  try {
-    const xOpt = await sqpOptimize(
-      x0, maxIter, tol,
-      (msg) => log(msg),
-      (pct) => {
-        document.getElementById('pFill').style.width = (pct*100)+'%';
-        document.getElementById('pLabel').textContent = `优化进度 ${(pct*100).toFixed(0)}%`;
-      }
-    );
-
-    const cstFinal = evalConstraints(xOpt);
-    const vioFinal = [...cstFinal.lin,...cstFinal.nonlin].filter(c=>c.val>c.lim+1e-6).length;
-    const oc_final = objComponents(xOpt);
-    log(`\n最优解: [${xOpt.map(v=>v.toFixed(4)).join(', ')}]`, 'info');
-    log(`最优 f₁ = ${oc_final.f1.toFixed(2)} N  |  f₂ = ${oc_final.f2.toFixed(2)} N`, 'info');
-    log(`最优总目标 f = ${objective(xOpt).toFixed(4)}`, 'info');
-    log(`最终违反约束数: ${vioFinal}`, vioFinal>0?'warn':'info');
-    if (vioFinal > 0) {
-      log('⚠ 部分约束仍有违反，建议调整初值后重新运行', 'warn');
-    }
-
-    renderResults(x0, xOpt);
-  } catch(e) {
-    log('✗ 优化出错: ' + e.message, 'err');
-  }
-
-  document.getElementById('btnRun').disabled = false;
-  document.getElementById('pLabel').textContent = '优化完成';
-}
-
-function evalCurrent() {
-  const x0 = getX0();
-  document.getElementById('hintBox').style.display = 'none';
-  document.getElementById('progressPanel').style.display = 'none';
-  renderResults(x0, null);
-}
-
-// Init
-resetToDefault();
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
 if (e.key === 'F12' || 
@@ -2424,7 +2605,6 @@ e.preventDefault();
 return false;
 }
 });
-
 </script>
 <script>
   document.addEventListener('contextmenu', e => e.preventDefault());
@@ -2438,6 +2618,17 @@ return false;
     }
   });
 </script>
-
+<script>
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.key === 'U') ||
+        (e.ctrlKey && e.key === 'S')) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
 </body>
 </html>
